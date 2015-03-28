@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red">#ee3e23</color>
+    <color name="green">#7ac142</color>
+    <color name="blue">#29abe2</color>
+    <color name="orange">#ce7132</color>
+    <color name="navy">#2d358f</color>
+    <color name="lilac">#7f3f98</color>
+
+    <color name="dark_lilac">#91288d</color>
+    <color name="dark_cyan">#1d75bb</color>
+    <color name="dark_magenta">#9e2063</color>
+    <color name="dark_navy">#282561</color>
+    <color name="dark_green">#009447</color>
+    <color name="dark_red">#bd202e</color>
+</resources>
