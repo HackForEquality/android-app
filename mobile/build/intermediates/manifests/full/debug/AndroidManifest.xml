@@ -14,6 +14,7 @@
     <uses-feature android:name="android.hardware.camera.front" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +23,12 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="ie.yesequality.yesequality.CameraMainActivity"
-            android:label="@string/title_activity_camera_main" >
+            android:label="@string/title_activity_camera_main"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ie.yesequality.yesequality.SplashScreen"
+            android:label="@string/title_activity_splash_screen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

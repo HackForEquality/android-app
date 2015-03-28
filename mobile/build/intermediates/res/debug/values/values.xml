@@ -22,6 +22,11 @@
     <color name="background_floating_material_light">#ffeeeeee</color>
     <color name="background_material_dark">#ff303030</color>
     <color name="background_material_light">#ffeeeeee</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="blue">#29abe2</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
+    <eat-comment/>
     <color name="bright_foreground_disabled_material_dark">#80ffffff</color>
     <color name="bright_foreground_disabled_material_light">#80000000</color>
     <color name="bright_foreground_inverse_material_dark">@color/bright_foreground_material_light</color>
@@ -42,16 +47,34 @@
     <color name="common_signin_btn_light_text_disabled">#FFAAAAAA</color>
     <color name="common_signin_btn_light_text_focused">#FF737373</color>
     <color name="common_signin_btn_light_text_pressed">@android:color/white</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="dark_cyan">#1d75bb</color>
+    <color name="dark_green">#009447</color>
+    <color name="dark_lilac">#91288d</color>
+    <color name="dark_magenta">#9e2063</color>
+    <color name="dark_navy">#282561</color>
+    <color name="dark_red">#bd202e</color>
     <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
     <eat-comment/>
     <color name="dim_foreground_disabled_material_dark">#80bebebe</color>
     <color name="dim_foreground_disabled_material_light">#80323232</color>
     <color name="dim_foreground_material_dark">#ffbebebe</color>
     <color name="dim_foreground_material_light">#ff323232</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="green">#7ac142</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
+    <eat-comment/>
     <color name="highlighted_text_material_dark">#6680cbc4</color>
     <color name="highlighted_text_material_light">#66009688</color>
     <color name="hint_foreground_material_dark">@color/bright_foreground_disabled_material_dark</color>
     <color name="hint_foreground_material_light">@color/bright_foreground_disabled_material_light</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="lilac">#7f3f98</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
+    <eat-comment/>
     <color name="link_text_material_dark">@color/material_deep_teal_200</color>
     <color name="link_text_material_light">@color/material_deep_teal_500</color>
     <color name="material_blue_grey_800">#ff37474f</color>
@@ -59,6 +82,12 @@
     <color name="material_blue_grey_950">#ff21272b</color>
     <color name="material_deep_teal_200">#ff80cbc4</color>
     <color name="material_deep_teal_500">#ff009688</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="navy">#2d358f</color>
+    <color name="orange">#ce7132</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
+    <eat-comment/>
     <color name="primary_dark_material_dark">#ff000000</color>
     <color name="primary_dark_material_light">#ff757575</color>
     <color name="primary_material_dark">#ff212121</color>
@@ -67,6 +96,11 @@
     <color name="primary_text_default_material_light">#de000000</color>
     <color name="primary_text_disabled_material_dark">#4Dffffff</color>
     <color name="primary_text_disabled_material_light">#39000000</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="red">#ee3e23</color>
+    <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
+    <eat-comment/>
     <color name="ripple_material_dark">#40ffffff</color>
     <color name="ripple_material_light">#40000000</color>
     <color name="secondary_text_default_material_dark">#b3ffffff</color>
@@ -252,6 +286,7 @@
     <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="title_activity_camera_main">CameraMainActivity</string>
+    <string name="title_activity_splash_screen">Yes Equality</string>
     <!-- From: file:/Users/kimi/Desktop/equality/android-app/mobile/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/res/values/wallet_strings.xml -->
     <eat-comment/>
     <string name="wallet_buy_button_place_holder" translation_description="Text on a button that allows a user to make a payment with Google Wallet [CHAR LIMIT=30]">Buy with Google</string>

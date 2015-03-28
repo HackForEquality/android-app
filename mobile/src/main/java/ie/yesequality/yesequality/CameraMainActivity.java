@@ -2,12 +2,21 @@ package ie.yesequality.yesequality;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,11 +30,16 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
 
 
@@ -38,7 +52,10 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     boolean previewing = false;
     LayoutInflater controlInflater = null;
 
+    int duration = Toast.LENGTH_SHORT;
+    static int pictureWidth = 0;
 
+    ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton;
 
 
     @Override
@@ -61,7 +78,9 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
 
 
-        LinearLayout surfaceLayout = (LinearLayout)findViewById(R.id.surface_layout);
+        pictureWidth = screenWidth;
+
+        RelativeLayout surfaceLayout = (RelativeLayout)findViewById(R.id.surface_layout);
         LayoutParams params = surfaceLayout.getLayoutParams();
         params.height = screenWidth;
         params.width = screenWidth;
@@ -108,8 +127,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
        // this.addContentView(viewControl, layoutParamsControl);
 
 
-        ImageView img = (ImageView) findViewById(R.id.selfieButton);
-        img.setOnClickListener(new View.OnClickListener() {
+        selfieButton = (ImageView) findViewById(R.id.selfieButton);
+        selfieButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // your code here
 
@@ -119,8 +138,83 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         });
 
 
+        retakeButton = (ImageView) findViewById(R.id.retakeButton);
+        retakeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your code here
+
+                retakeLogic();
+               // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+            }
+        });
+
+
+        shareButtonBot = (ImageView) findViewById(R.id.shareButtonBotom);
+        shareButtonBot.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your code here
+                shareIt();
+
+                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+            }
+        });
+
+        shareButton = (ImageView) findViewById(R.id.shareButton);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your code here
+
+
+                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+            }
+        });
+
+        infoButton = (ImageView) findViewById(R.id.moreInfoButton);
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your code here
+
+
+                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+            }
+        });
+
+
+
+
 
     }
+
+    private void shareIt() {
+
+        String fname = getPhotoDirectory(CameraMainActivity.this)+"/yesequal.jpg";
+
+        Bitmap myfile = BitmapFactory.decodeFile(fname);
+
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/jpeg");
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "title");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                values);
+
+
+        OutputStream outstream;
+        try {
+            outstream = getContentResolver().openOutputStream(uri);
+            myfile.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
+            outstream.close();
+        } catch (Exception e) {
+            System.err.println(e.toString());
+
+        }
+
+        share.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(share, "Share Image"));
+    }
+
 
 
     @Override
@@ -146,34 +240,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
-  /*  @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-        if(previewing){
-            mCamera.stopPreview();
-            previewing = false;
-        }
-
-        Camera.Parameters parameters = mCamera.getParameters();
-        List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-        Camera.Size previewSize = previewSizes.get(4); //480h x 720w
-
-        parameters.setPreviewSize(previewSize.width, previewSize.height);
-        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
-        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
-        mCamera.setParameters(parameters);
-
-        Display display = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        if(display.getRotation() == Surface.ROTATION_0) {
-            mCamera.setDisplayOrientation(90);
-        } else if(display.getRotation() == Surface.ROTATION_270) {
-            mCamera.setDisplayOrientation(180);
-        }
-
-        mCamera.startPreview();
-    }*/
-
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -183,17 +249,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             try {
 
                 mCamera.setPreviewDisplay(surfaceHolder);
-            /*    Camera.Parameters parameters = mCamera.getParameters();
-                List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-                Camera.Size previewSize = previewSizes.get(4); //480h x 720w
 
-                parameters.setPreviewSize(previewSize.width, previewSize.height);
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
-
-
-                mCamera.setParameters(parameters);*/
 
                 mCamera.startPreview();
                 previewing = true;
@@ -207,6 +263,11 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+
+
+        selfieButton.setVisibility(View.VISIBLE);
+        retakeButton.setVisibility(View.INVISIBLE);
+        shareButtonBot.setVisibility(View.INVISIBLE);
 
         if (Camera.getNumberOfCameras() >= 2) {
 
@@ -229,6 +290,11 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         mCamera.release();
         mCamera = null;
         previewing = false;
+
+        selfieButton.setVisibility(View.VISIBLE);
+        retakeButton.setVisibility(View.INVISIBLE);
+        shareButtonBot.setVisibility(View.INVISIBLE);
+
     }
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
@@ -266,25 +332,116 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
+
+
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        Matrix matrix =  new Matrix();
+        matrix.postTranslate(pictureWidth/20,(int)((pictureWidth/10) * 8.5));
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(bmp2, matrix , null);
+        return bmOverlay;
+    }
+
+
+    byte[] resizeImageAndWaterMark(byte[] input, int width, int height) {
+        Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
+      //  Bitmap resized = Bitmap.createScaledBitmap(original, width, height, true);
+
+
+        Matrix matrix = new Matrix();
+
+        matrix.postRotate(-90);
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original,width,height,true);
+
+        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
+
+
+        Bitmap waterMark = BitmapFactory.decodeResource(this.getResources(),
+                R.drawable.ic_yes_icon);
+
+        rotatedBitmap = overlay(rotatedBitmap, waterMark);
+
+
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, blob);
+
+        return blob.toByteArray();
+    }
+
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
+
+
+
+            data = resizeImageAndWaterMark(data, pictureWidth, pictureWidth);
+
+
+        selfieButton.setVisibility(View.INVISIBLE);
+        retakeButton.setVisibility(View.VISIBLE);
+        shareButtonBot.setVisibility(View.VISIBLE);
+
+
             try {
-                FileOutputStream out = openFileOutput("yesForEquaity.jpg", Activity.MODE_PRIVATE);
-                out.write(data);
-                out.flush();
-                out.close();
+
+                Date now = new Date(); long nowLong = now.getTime() / 9000;
+                String fname = getPhotoDirectory(CameraMainActivity.this)+"/yesequal.jpg";
+
+
+                File ld = new File(getPhotoDirectory(CameraMainActivity.this));
+                if (ld.exists()) {
+                    if (!ld.isDirectory()){
+                        CameraMainActivity.this.finish();
+                    }
+                } else {
+                    ld.mkdir();
+                }
+
+                Log.d("YES", "open output stream "+fname +" : " +data.length);
+
+                OutputStream os = new FileOutputStream(fname);
+                os.write(data,0,data.length);
+                os.close();
+
+
             } catch (FileNotFoundException e) {
+                Toast.makeText(CameraMainActivity.this, "FILE NOT FOUND !", duration).show();
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+                Toast.makeText(CameraMainActivity.this, "IO EXCEPTION", duration).show();
             }
-            camera.startPreview();
+          //  camera.startPreview();
 
+    }
+
+
+   public void retakeLogic() {
+
+       selfieButton.setVisibility(View.VISIBLE);
+       retakeButton.setVisibility(View.INVISIBLE);
+       shareButtonBot.setVisibility(View.INVISIBLE);
+
+       if ( mCamera != null ) {
+           mCamera.startPreview();
+       }
+
+   }
+
+
+
+    public static String getPhotoDirectory(Context context)
+    {
+        //return Environment.getExternalStorageDirectory().getPath() +"/cbo-up";
+        //return context.getExternalCacheDir().getPath();
+        return context.getExternalFilesDir(null).getPath();
     }
 
     @Override
     public void onShutter() {
-        int duration = Toast.LENGTH_SHORT;
+
         Toast.makeText(CameraMainActivity.this, "Selfie Time! :)", duration).show();
 
     }

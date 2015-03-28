@@ -25,7 +25,7 @@
             android:layout_height="fill_parent"
             android:layout_width="0dp"
             android:layout_weight=".15"
-            android:src="@drawable/abc_btn_check_material"
+            android:src="@drawable/ic_action_info"
             >
         </ImageView>
             <LinearLayout
@@ -58,18 +58,29 @@
 
 
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/surface_layout"
         android:layout_width="fill_parent"
         android:layout_height="200px">
 
-    <SurfaceView
+        <SurfaceView
         android:id="@+id/surface_camera"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         />
 
-    </LinearLayout>
+        <ImageView
+
+            android:id="@+id/waterMarkPic"
+            android:layout_height="100dp"
+            android:layout_width="100dp"
+            android:layout_alignBottom="@+id/surface_camera"
+            android:src="@drawable/ic_yes_icon"
+            android:visibility="visible"
+            android:layout_marginLeft="20dp">
+        </ImageView>
+
+    </RelativeLayout>
 
 
     <LinearLayout
@@ -81,25 +92,60 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".4"
+                android:layout_weight=".1"
                 >
             </LinearLayout>
+
+        <ImageView
+
+            android:id="@+id/retakeButton"
+            android:layout_height="fill_parent"
+            android:layout_width="0dp"
+            android:layout_weight=".2"
+            android:src="@drawable/ic_content_clear"
+            android:visibility="invisible"
+            >
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".1"
+            >
+        </LinearLayout>
+
         <ImageView
 
             android:id="@+id/selfieButton"
             android:layout_height="fill_parent"
             android:layout_width="0dp"
             android:layout_weight=".2"
-            android:src="@drawable/ic_plusone_small_off_client"
+            android:src="@drawable/ic_selfie"
             >
         </ImageView>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".4"
+                android:layout_weight=".1"
                 >
             </LinearLayout>
 
+        <ImageView
+
+            android:id="@+id/shareButtonBotom"
+            android:layout_height="fill_parent"
+            android:layout_width="0dp"
+            android:layout_weight=".2"
+            android:src="@drawable/ic_shareb"
+            android:visibility="invisible"
+            >  </ImageView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".1"
+            >
+        </LinearLayout>
 
 
 
