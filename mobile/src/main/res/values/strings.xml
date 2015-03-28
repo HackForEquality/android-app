@@ -1,8 +1,30 @@
 <resources>
     <string name="app_name">Yes Equality</string>
+
     <string name="title_activity_camera_main">CameraMainActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_splash_screen">Yes Equality</string>
+
+    <string name="title_activity_test">TestActivity</string>
+
+
+    <string-array name="listItems">
+        <item>Information</item>
+        <item>Myths</item>
+        <item>Locations</item>
+        <item>Guides</item>
+    </string-array>
+
+    <string name="fragment_voting_guide_text">This is the voting guide fragment</string>
+    <string name="fragment_information_text">This is the information fragment</string>
+    <string name="fragment_locations_text">This is the locations fragment</string>
+    <string name="fragment_myths_text">This is the myths fragment</string>
+    <string name="title_activity_information_fragment">InformationFragment</string>
+    <string name="title_activity_myths_fragment">MythsFragment</string>
+    <string name="title_activity_fragment_locations">FragmentLocations</string>
+    <string name="title_activity_myths_page_one_fragment">MythsPageOneFragment</string>
+    <string name="title_activity_myths_page_two_fragment">MythsPageTwoFragment</string>
+
 </resources>
