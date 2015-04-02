@@ -27,4 +27,25 @@
     <string name="title_activity_myths_page_one_fragment">MythsPageOneFragment</string>
     <string name="title_activity_myths_page_two_fragment">MythsPageTwoFragment</string>
 
+    <!-- Strings for information pages messy messy messy...-->
+
+    <string name="information_page_string_one">On May 22nd 2015 the people of Ireland will all be asked to vote in the referendum on Civil Marriage equality. Marriage is about two people who love each other and want to commit to each other. In a republic based on equal citizenship, civil marriage should be open to all, including lesbians and gay men.</string>
+    <string name="information_page_string_two">To vote on May 22nd you must be:</string>
+    <string name="information_page_string_three">Over 18</string>
+    <string name="information_page_string_four">Irish Citizen</string>
+    <string name="information_page_string_five">Resident in the republic</string>
+    <string name="information_page_string_six">Registered to vote</string>
+    <string name="information_page_string_seven">Check to see if you are registered</string>
+    <string name="information_page_string_eight">checktheregister.ie</string>
+    <string name="information_page_string_nine">Registering is easy</string>
+    <string name="information_page_string_ten">Download the form</string>
+    <string name="information_page_string_eleven">Get it signed &amp; stamped by a Garda</string>
+    <string name="information_page_string_twelve">Return it to your local authority office</string>
+    <string name="information_page_string_thirteen">Student?</string>
+    <string name="information_page_string_fourteen">You can vote by post</string>
+    <string name="information_page_string_fifteen">Away for work?</string>
+    <string name="information_page_string_sixteen">You can vote by post too!</string>
+    <string name="information_page_string_seventeen">Changed address?</string>
+    <string name="information_page_string_eighteen">Theres a form for that</string>
+
 </resources>

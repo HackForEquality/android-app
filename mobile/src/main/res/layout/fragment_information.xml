@@ -8,9 +8,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ie.yesequality.yesequality.InformationFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/fragment_information_text" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/information_viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
 </RelativeLayout>
