@@ -2,6 +2,7 @@
     <string name="app_name">Yes Equality</string>
 
     <string name="title_activity_camera_main">CameraMainActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

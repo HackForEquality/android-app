@@ -160,10 +160,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         infoButton = (ImageView) findViewById(R.id.moreInfoButton);
         infoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // your code here
-
-
-                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+                Intent intent = new Intent(CameraMainActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
 
