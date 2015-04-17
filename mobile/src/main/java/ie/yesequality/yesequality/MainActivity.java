@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 public class MainActivity extends FragmentActivity {
@@ -16,6 +17,7 @@ public class MainActivity extends FragmentActivity {
     private ListView mDrawerList;
     private DrawerLayout mDrawerLayout;
     private String[] mListItems;
+    private Button closeInfoScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +27,20 @@ public class MainActivity extends FragmentActivity {
         mListItems = getResources().getStringArray(R.array.listItems);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        closeInfoScreen = (Button) findViewById(R.id.closeInfoButton);
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_item_list, mListItems));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        closeInfoScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         if (savedInstanceState == null) {
             selectItem(0);
