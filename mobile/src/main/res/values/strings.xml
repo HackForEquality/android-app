@@ -2,6 +2,7 @@
     <string name="app_name">Yes Equality</string>
 
     <string name="title_activity_camera_main">CameraMainActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -46,6 +47,7 @@
     <string name="information_page_string_fifteen">Away for work?</string>
     <string name="information_page_string_sixteen">You can vote by post too!</string>
     <string name="information_page_string_seventeen">Changed address?</string>
-    <string name="information_page_string_eighteen">Theres a form for that</string>
+    <string name="information_page_string_eighteen">There\'s a form for that</string>
+    <string name="closeInfoScreen">X</string>
 
 </resources>

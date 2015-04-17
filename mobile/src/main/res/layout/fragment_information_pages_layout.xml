@@ -9,7 +9,8 @@
         android:id="@+id/information_above_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#fff" />
+        android:textColor="#fff"
+        android:textSize="22sp" />
 
     <ImageView
         android:id="@+id/information_image"
@@ -20,7 +21,8 @@
         android:id="@+id/information_below_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#fff" />
+        android:textColor="#fff"
+        android:textSize="22sp" />
 
 
 </LinearLayout>

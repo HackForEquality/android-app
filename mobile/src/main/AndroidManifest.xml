@@ -23,6 +23,11 @@
             android:label="@string/title_activity_camera_main" >
         </activity>
         <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_main" >
+        </activity>
+        <activity
             android:name=".SplashScreen"
             android:label="@string/title_activity_splash_screen" >
 
