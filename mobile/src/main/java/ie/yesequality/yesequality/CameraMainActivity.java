@@ -2,11 +2,10 @@ package ie.yesequality.yesequality;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -17,19 +16,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Display;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -55,8 +54,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     int duration = Toast.LENGTH_SHORT;
     static int pictureWidth = 0;
 
-    ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton;
-
+    ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton, badge;
+    RelativeLayout surfaceLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +66,10 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         setContentView(R.layout.surface_camera_layout);
 
-     //   setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //   setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         getWindow().setFormat(PixelFormat.UNKNOWN);
-        surfaceView = (SurfaceView)findViewById(R.id.surface_camera);
-
+        surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
 
 
         int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
@@ -80,7 +78,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         pictureWidth = screenWidth;
 
-        RelativeLayout surfaceLayout = (RelativeLayout)findViewById(R.id.surface_layout);
+        surfaceLayout = (RelativeLayout) findViewById(R.id.surface_layout);
         LayoutParams params = surfaceLayout.getLayoutParams();
         params.height = screenWidth;
         params.width = screenWidth;
@@ -88,29 +86,21 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         int usable = screenHeight - screenWidth;
 
 
-
-
-
-
-
-        LinearLayout topLayout = (LinearLayout)findViewById(R.id.top_bar);
+        LinearLayout topLayout = (LinearLayout) findViewById(R.id.top_bar);
         LayoutParams paramsTop = topLayout.getLayoutParams();
-       // paramsTop.height = usable/3;
-       // paramsTop.width = usable/2;
+        // paramsTop.height = usable/3;
+        // paramsTop.width = usable/2;
 
-        LinearLayout bottomLayout = (LinearLayout)findViewById(R.id.bottom_bar);
+        LinearLayout bottomLayout = (LinearLayout) findViewById(R.id.bottom_bar);
         LayoutParams paramsBot = bottomLayout.getLayoutParams();
         paramsBot.height = usable - paramsTop.height;
-       // paramsBot.width = usable/2;
-
+        // paramsBot.width = usable/2;
 
 
         //  surfaceLayout.setLayoutParams(params);
 
         //Get the width of the screen
-      //  int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
-
-
+        //  int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 
 
         surfaceHolder = surfaceView.getHolder();
@@ -118,13 +108,11 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 
-
-
         controlInflater = LayoutInflater.from(getBaseContext());
-       // View viewControl = controlInflater.inflate(R.layout.custom_camera, null);
+        // View viewControl = controlInflater.inflate(R.layout.custom_camera, null);
         ActionBar.LayoutParams layoutParamsControl = new ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT,
                 ActionBar.LayoutParams.FILL_PARENT);
-       // this.addContentView(viewControl, layoutParamsControl);
+        // this.addContentView(viewControl, layoutParamsControl);
 
 
         selfieButton = (ImageView) findViewById(R.id.selfieButton);
@@ -144,7 +132,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
                 // your code here
 
                 retakeLogic();
-               // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
             }
         });
 
@@ -179,15 +167,48 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             }
         });
 
+        badge = (ImageView) findViewById(R.id.waterMarkPic);
+        badge.setOnTouchListener(new BadgeTouchListener());
+        badge.setOnDragListener(new BadgeDragListener());
 
+        surfaceLayout.setOnDragListener(new BadgeDragListener());
+    }
 
+    private final class BadgeTouchListener implements View.OnTouchListener {
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                view.startDrag(data, shadowBuilder, view, 0);
+                view.setVisibility(View.INVISIBLE);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 
-
+    private final class BadgeDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            int action = event.getAction();
+            switch (action) {
+                case DragEvent.ACTION_DROP:
+                    View view = (View) event.getLocalState();
+                    view.setX(event.getX() - (view.getWidth() / 2));
+                    view.setY(event.getY() - (view.getHeight() / 2));
+                    view.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
     }
 
     private void shareIt() {
 
-        String fname = getPhotoDirectory(CameraMainActivity.this)+"/yesequal.jpg";
+        String fname = getPhotoDirectory(CameraMainActivity.this) + "/yesequal.jpg";
 
         Bitmap myfile = BitmapFactory.decodeFile(fname);
 
@@ -216,7 +237,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -240,16 +260,14 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
 
-        if (mCamera != null){
+        if (mCamera != null) {
             try {
 
                 mCamera.setPreviewDisplay(surfaceHolder);
-
 
                 mCamera.startPreview();
                 previewing = true;
@@ -258,7 +276,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             }
         }
     }
-
 
 
     @Override
@@ -272,16 +289,24 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         if (Camera.getNumberOfCameras() >= 2) {
 
             //if you want to open front facing camera use this line
-            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-
+            try {
+                mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            } catch (Exception ex) {
+                Toast.makeText(this, "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+            }
             //if you want to use the back facing camera
-           // camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+            // camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
         } else {
-            mCamera = Camera.open();
+            try {
+                mCamera = Camera.open();
+            } catch (Exception ex) {
+                Toast.makeText(this, "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+            }
         }
 
-
-        mCamera.setDisplayOrientation(90);
+        if (mCamera != null) {
+            mCamera.setDisplayOrientation(90);
+        }
     }
 
     @Override
@@ -299,9 +324,9 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.05;
-        double targetRatio = (double) w/h;
+        double targetRatio = (double) w / h;
 
-        if (sizes==null) return null;
+        if (sizes == null) return null;
 
         Camera.Size optimalSize = null;
 
@@ -332,38 +357,47 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
-
-
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
-        Matrix matrix =  new Matrix();
-        matrix.postTranslate(pictureWidth/20,(int)((pictureWidth/10) * 8.5));
-        canvas.drawBitmap(bmp1, new Matrix(), null);
-        canvas.drawBitmap(bmp2, matrix , null);
+
+        // mirror the camera snapshot to match the camera preview
+        Matrix matrixBmp1 = new Matrix();
+        matrixBmp1.setScale(-1, 1);
+        matrixBmp1.postTranslate(bmp1.getWidth(), 0);
+
+        // set the badge position and dimension, to match the one from the camera preview
+        Matrix matrixBmp2 = new Matrix();
+        matrixBmp2.postTranslate(badge.getX(), badge.getY());
+
+        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2,
+                badge.getWidth(),
+                badge.getHeight(),
+                true);
+
+        canvas.drawBitmap(bmp1, matrixBmp1, null);
+        canvas.drawBitmap(scaledBadge, matrixBmp2, null);
+
         return bmOverlay;
     }
 
 
     byte[] resizeImageAndWaterMark(byte[] input, int width, int height) {
         Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
-      //  Bitmap resized = Bitmap.createScaledBitmap(original, width, height, true);
-
+        //  Bitmap resized = Bitmap.createScaledBitmap(original, width, height, true);
 
         Matrix matrix = new Matrix();
 
         matrix.postRotate(-90);
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original,width,height,true);
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original, width, height, true);
 
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
-
+        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
         Bitmap waterMark = BitmapFactory.decodeResource(this.getResources(),
                 R.drawable.ic_yes_icon);
 
         rotatedBitmap = overlay(rotatedBitmap, waterMark);
-
 
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, blob);
@@ -375,8 +409,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     public void onPictureTaken(byte[] data, Camera camera) {
 
 
-
-            data = resizeImageAndWaterMark(data, pictureWidth, pictureWidth);
+        data = resizeImageAndWaterMark(data, pictureWidth, pictureWidth);
 
 
         selfieButton.setVisibility(View.INVISIBLE);
@@ -384,56 +417,55 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         shareButtonBot.setVisibility(View.VISIBLE);
 
 
-            try {
+        try {
 
-                Date now = new Date(); long nowLong = now.getTime() / 9000;
-                String fname = getPhotoDirectory(CameraMainActivity.this)+"/yesequal.jpg";
+            Date now = new Date();
+            long nowLong = now.getTime() / 9000;
+            String fname = getPhotoDirectory(CameraMainActivity.this) + "/yesequal.jpg";
 
 
-                File ld = new File(getPhotoDirectory(CameraMainActivity.this));
-                if (ld.exists()) {
-                    if (!ld.isDirectory()){
-                        CameraMainActivity.this.finish();
-                    }
-                } else {
-                    ld.mkdir();
+            File ld = new File(getPhotoDirectory(CameraMainActivity.this));
+            if (ld.exists()) {
+                if (!ld.isDirectory()) {
+                    CameraMainActivity.this.finish();
                 }
-
-                Log.d("YES", "open output stream "+fname +" : " +data.length);
-
-                OutputStream os = new FileOutputStream(fname);
-                os.write(data,0,data.length);
-                os.close();
-
-
-            } catch (FileNotFoundException e) {
-                Toast.makeText(CameraMainActivity.this, "FILE NOT FOUND !", duration).show();
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(CameraMainActivity.this, "IO EXCEPTION", duration).show();
+            } else {
+                ld.mkdir();
             }
-          //  camera.startPreview();
+
+            Log.d("YES", "open output stream " + fname + " : " + data.length);
+
+            OutputStream os = new FileOutputStream(fname);
+            os.write(data, 0, data.length);
+            os.close();
+
+
+        } catch (FileNotFoundException e) {
+            Toast.makeText(CameraMainActivity.this, "FILE NOT FOUND !", duration).show();
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(CameraMainActivity.this, "IO EXCEPTION", duration).show();
+        }
+        //  camera.startPreview();
 
     }
 
 
-   public void retakeLogic() {
+    public void retakeLogic() {
 
-       selfieButton.setVisibility(View.VISIBLE);
-       retakeButton.setVisibility(View.INVISIBLE);
-       shareButtonBot.setVisibility(View.INVISIBLE);
+        selfieButton.setVisibility(View.VISIBLE);
+        retakeButton.setVisibility(View.INVISIBLE);
+        shareButtonBot.setVisibility(View.INVISIBLE);
 
-       if ( mCamera != null ) {
-           mCamera.startPreview();
-       }
+        if (mCamera != null) {
+            mCamera.startPreview();
+        }
 
-   }
+    }
 
 
-
-    public static String getPhotoDirectory(Context context)
-    {
+    public static String getPhotoDirectory(Context context) {
         //return Environment.getExternalStorageDirectory().getPath() +"/cbo-up";
         //return context.getExternalCacheDir().getPath();
         return context.getExternalFilesDir(null).getPath();
