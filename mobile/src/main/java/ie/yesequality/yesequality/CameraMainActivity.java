@@ -58,7 +58,17 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton, badge;
     RelativeLayout surfaceLayout;
 
-    private int[] mVoteBadges = new int[]{R.drawable.ic_vote_yes_white, R.drawable.ic_vote_yes_color};
+    private int[] mVoteBadges = new int[]{R.drawable.ic_vote_for_me,
+            R.drawable.ic_vote_for_me_color,
+            R.drawable.ic_yes_im_voting,
+            R.drawable.ic_yes_im_voting_color,
+            R.drawable.ic_we_voting,
+            R.drawable.ic_we_voting_color,
+            R.drawable.ic_ta,
+            R.drawable.ic_ta_color,
+            R.drawable.ic_yes,
+            R.drawable.ic_yes_color
+    };
     private int mSelectedBadge = 0;
 
     @Override
