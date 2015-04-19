@@ -49,5 +49,12 @@
     <string name="information_page_string_seventeen">Changed address?</string>
     <string name="information_page_string_eighteen">There\'s a form for that</string>
     <string name="closeInfoScreen">X</string>
+    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="notificationDayBefore">Remind me the day before</string>
+    <string name="NotificationOnDay">Remind me on the day</string>
+    <string name="dontForgetOnDay">Don\'t forget to vote YES</string>
+    <string name="dontForgetDayBefore">Tell your friends, tell everybody to vote YES tomorrow!</string>
+    <string name="dontForgetTitle">Don\'t Forget!</string>
+    <string name="okButtonNotifications">OK</string>
 
 </resources>
