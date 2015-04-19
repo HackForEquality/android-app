@@ -7,13 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 
 public class NotificationActivity extends Activity {
@@ -23,7 +22,11 @@ public class NotificationActivity extends Activity {
     public static final String ON_DAY_BEFORE = "on_day_before";
     @InjectView(R.id.switchDayBefore) Switch dayBefore;
     @InjectView(R.id.switchOnDay) Switch onDay;
-    @InjectView(R.id.okButton) Button okButton;
+
+    @OnClick(R.id.okButton)
+    public void closeScreen() {
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +38,6 @@ public class NotificationActivity extends Activity {
         final SharedPreferences.Editor editor = notificationPrefs.edit();
         onDay.setChecked(notificationPrefs.getBoolean(ON_DAY, true));
         dayBefore.setChecked(notificationPrefs.getBoolean(ON_DAY_BEFORE, true));
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         onDay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -70,7 +66,6 @@ public class NotificationActivity extends Activity {
                 }
             }
         });
-
     }
 
     private void registerAlarm(boolean onDay) {
@@ -81,7 +76,6 @@ public class NotificationActivity extends Activity {
         else {
             // Register alarm for day before voting day
             Log.d("NotificationActivity", "Registering Alarm for day before Voting day");
-
         }
     }
 
@@ -93,7 +87,6 @@ public class NotificationActivity extends Activity {
         else {
             // Canceling alarm for day before voting day
             Log.d("NotificationActivity", "Canceling Alarm for day before Voting day");
-
         }
     }
 
