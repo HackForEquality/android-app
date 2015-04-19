@@ -2,10 +2,12 @@ package ie.yesequality.yesequality;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import butterknife.ButterKnife;
@@ -30,6 +32,59 @@ public class NotificationActivity extends Activity {
                 finish();
             }
         });
+
+        onDay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    //Register Alarm
+                    registerAlarm(true);
+                }
+                else {
+                    //Cancel Alarm
+                    cancelAlarm(true);
+                }
+            }
+        });
+
+        dayBefore.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    //Register Alarm
+                    registerAlarm(false);
+                }
+                else {
+                    //Cancel Alarm
+                    cancelAlarm(false);
+                }
+            }
+        });
+
+    }
+
+    private void registerAlarm(boolean onDay) {
+        if (onDay){
+            // Register alarm for voting day
+            Log.d("NotificationActivity", "Registering Alarm for Voting day");
+        }
+        else {
+            // Register alarm for day before voting day
+            Log.d("NotificationActivity", "Registering Alarm for day before Voting day");
+
+        }
+    }
+
+    private void cancelAlarm(boolean onDay) {
+        if (onDay){
+            // Canceling alarm for voting day
+            Log.d("NotificationActivity", "Canceling Alarm for Voting day");
+        }
+        else {
+            // Canceling alarm for day before voting day
+            Log.d("NotificationActivity", "Canceling Alarm for day before Voting day");
+
+        }
     }
 
 
