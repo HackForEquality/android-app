@@ -165,10 +165,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         shareButton = (ImageView) findViewById(R.id.shareButton);
         shareButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // your code here
-
-
-                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+                Intent intent = new Intent(CameraMainActivity.this, NotificationActivity.class);
+                startActivity(intent);
             }
         });
 
