@@ -17,6 +17,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    // Configuration for ButterKnife
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
 }
 
 dependencies {
@@ -24,4 +31,5 @@ dependencies {
     wearApp project(':wear')
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.jakewharton:butterknife:6.1.0'
 }
