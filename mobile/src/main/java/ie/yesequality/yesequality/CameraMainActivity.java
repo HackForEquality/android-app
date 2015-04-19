@@ -171,14 +171,24 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         });
 
         badge = (ImageView) findViewById(R.id.waterMarkPic);
-        badge.setOnTouchListener(new BadgeTouchListener());
         badge.setOnDragListener(new BadgeDragListener());
 
+        badge.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                v.startDrag(data, shadowBuilder, v, 0);
+                v.setVisibility(View.INVISIBLE);
+                return true;
+            }
+        });
+
         badge.setImageResource(mVoteBadges[mSelectedBadge]);
-        surfaceLayout.setOnClickListener(new View.OnClickListener() {
+        badge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSelectedBadge >= mVoteBadges.length - 1) {
+                if (mSelectedBadge >= mVoteBadges.length - 1) {
                     mSelectedBadge = 0;
                 } else {
                     mSelectedBadge++;
