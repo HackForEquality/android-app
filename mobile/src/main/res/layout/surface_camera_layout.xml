@@ -57,9 +57,9 @@
 
         <ImageView
             android:id="@+id/waterMarkPic"
-            android:layout_height="100dp"
-            android:layout_width="100dp"
-            android:src="@drawable/ic_yes_icon"
+            android:layout_height="150dp"
+            android:layout_width="150dp"
+            android:src="@drawable/ic_vote_yes_white"
             android:visibility="visible"
             android:layout_alignBottom="@+id/surface_camera"
             android:layout_marginLeft="20dp" />

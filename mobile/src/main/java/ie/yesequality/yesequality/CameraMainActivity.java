@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,6 +57,9 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton, badge;
     RelativeLayout surfaceLayout;
+
+    private int[] mVoteBadges = new int[]{R.drawable.ic_vote_yes_white, R.drawable.ic_vote_yes_color};
+    private int mSelectedBadge = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,10 +122,11 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         selfieButton = (ImageView) findViewById(R.id.selfieButton);
         selfieButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // your code here
-
-
-                mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+                if (mCamera != null) {
+                    mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
+                } else {
+                    Toast.makeText(getBaseContext(), "Can't connect to camera", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -168,6 +173,20 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         badge = (ImageView) findViewById(R.id.waterMarkPic);
         badge.setOnTouchListener(new BadgeTouchListener());
         badge.setOnDragListener(new BadgeDragListener());
+
+        badge.setImageResource(mVoteBadges[mSelectedBadge]);
+        surfaceLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSelectedBadge >= mVoteBadges.length - 1) {
+                    mSelectedBadge = 0;
+                } else {
+                    mSelectedBadge++;
+                }
+
+                badge.setImageResource(mVoteBadges[mSelectedBadge]);
+            }
+        });
 
         surfaceLayout.setOnDragListener(new BadgeDragListener());
     }
@@ -309,8 +328,10 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mCamera.stopPreview();
-        mCamera.release();
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
         mCamera = null;
         previewing = false;
 
@@ -392,8 +413,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
-        Bitmap waterMark = BitmapFactory.decodeResource(this.getResources(),
-                R.drawable.ic_yes_icon);
+        Bitmap waterMark = ((BitmapDrawable) badge.getDrawable()).getBitmap();
 
         rotatedBitmap = overlay(rotatedBitmap, waterMark);
 
