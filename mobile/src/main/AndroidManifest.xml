@@ -37,6 +37,12 @@
             android:name=".NotificationActivity"
             android:label="@string/title_activity_notification" >
         </activity>
+
+        <receiver
+            android:name=".broadcastreceivers.NotificationReceiver"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
     </application>
 
 </manifest>
