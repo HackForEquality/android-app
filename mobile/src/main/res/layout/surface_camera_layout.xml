@@ -34,7 +34,7 @@
             android:layout_height="fill_parent"
             android:layout_width="0dp"
             android:layout_weight=".15"
-            android:src="@drawable/abc_edit_text_material" />
+            android:src="@drawable/ic_reminders" />
 
         <LinearLayout
             android:layout_width="0dp"
