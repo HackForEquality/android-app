@@ -46,8 +46,7 @@ public class InformationFragment extends Fragment {
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon7, R.string.information_page_string_nine, R.string.information_page_string_eleven, R.color.dark_magenta));
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon8, R.string.information_page_string_nine, R.string.information_page_string_twelve, R.color.dark_red));
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon9, R.string.information_page_string_thirteen, R.string.information_page_string_fourteen, R.color.green));
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon10, R.string.information_page_string_fifteen, R.string.information_page_string_sixteen, R.color.lilac));
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon11, R.string.information_page_string_seventeen, R.string.information_page_string_eighteen, R.color.dark_cyan));
+        fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_yes_color, R.string.information_page_string_seventeen, R.string.information_page_string_eighteen, R.color.white));
         return fragments;
     }
 }
