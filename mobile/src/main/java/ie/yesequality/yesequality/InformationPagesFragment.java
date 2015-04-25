@@ -1,5 +1,7 @@
 package ie.yesequality.yesequality;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,7 +16,9 @@ import android.widget.TextView;
 
 public class InformationPagesFragment extends Fragment {
 
-    public static final InformationPagesFragment newInstance(int pictureID, int aboveTextID, int belowTextID, int colorID) {
+    public static final InformationPagesFragment newInstance(int pictureID, int aboveTextID,
+                                                             int belowTextID, int colorID,
+                                                             String link, int textColor) {
 
         InformationPagesFragment fragment = new InformationPagesFragment();
 
@@ -23,6 +27,8 @@ public class InformationPagesFragment extends Fragment {
         bundle.putInt("BELOW_TEXT", belowTextID);
         bundle.putInt("ABOVE_TEXT", aboveTextID);
         bundle.putInt("COLOR_ID", colorID);
+        bundle.putString("LINK", link);
+        bundle.putInt("TEXT_COLOR", textColor);
 
         fragment.setArguments(bundle);
 
@@ -46,8 +52,22 @@ public class InformationPagesFragment extends Fragment {
 
         aboveTextView.setText(aboveText);
         belowTextView.setText(belowText);
-        imageView.setImageResource(imageID);
+        aboveTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR")));
+        belowTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR")));
 
+        imageView.setImageResource(imageID);
+        final String link = getArguments().getString("LINK", "");
+        if(!link.equals("")) {
+            imageView.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setData(Uri.parse(link));
+                    startActivity(intent);
+                }
+            });
+        }
 
         return rootView;
     }
