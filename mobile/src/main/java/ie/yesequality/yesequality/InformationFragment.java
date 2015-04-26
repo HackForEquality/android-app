@@ -60,7 +60,7 @@ public class InformationFragment extends Fragment {
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon6,
                 R.string.information_page_string_nine, R.string.information_page_string_ten,
-                R.color.dark_green, "", R.color.white));
+                R.color.dark_green, "https://www.yesequality.ie/?attachment_id=1283", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon7,
                 R.string.information_page_string_nine, R.string.information_page_string_eleven,
