@@ -9,20 +9,24 @@
         android:id="@+id/information_above_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textColor="#fff"
-        android:textSize="22sp" />
+        android:textSize="32sp"
+        android:paddingBottom="30dp"/>
 
     <ImageView
         android:id="@+id/information_image"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingBottom="30dp" />
 
     <TextView
         android:id="@+id/information_below_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textColor="#fff"
-        android:textSize="22sp" />
+        android:textSize="32sp" />
 
 
 </LinearLayout>

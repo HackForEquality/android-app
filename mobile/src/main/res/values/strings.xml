@@ -32,7 +32,7 @@
 
     <string name="information_page_string_one">On May 22nd 2015 the people of Ireland will all be asked to vote in the referendum on Civil Marriage equality. Marriage is about two people who love each other and want to commit to each other. In a republic based on equal citizenship, civil marriage should be open to all, including lesbians and gay men.</string>
     <string name="information_page_string_two">To vote on May 22nd you must be:</string>
-    <string name="information_page_string_three">Over 18</string>
+    <string name="information_page_string_three">Aged over 18</string>
     <string name="information_page_string_four">Irish Citizen</string>
     <string name="information_page_string_five">Resident in the republic</string>
     <string name="information_page_string_six">Registered to vote</string>
@@ -41,13 +41,13 @@
     <string name="information_page_string_nine">Registering is easy</string>
     <string name="information_page_string_ten">Download the form</string>
     <string name="information_page_string_eleven">Get it signed &amp; stamped by a Garda</string>
-    <string name="information_page_string_twelve">Return it to your local authority office</string>
-    <string name="information_page_string_thirteen">Student?</string>
-    <string name="information_page_string_fourteen">You can vote by post</string>
+    <string name="information_page_string_twelve">Return it to your local authority office by May 5th</string>
+    <string name="information_page_string_thirteen">On May 22nd</string>
+    <string name="information_page_string_fourteen">Polling stations will be open from 7am to 10pm</string>
     <string name="information_page_string_fifteen">Away for work?</string>
     <string name="information_page_string_sixteen">You can vote by post too!</string>
-    <string name="information_page_string_seventeen">Changed address?</string>
-    <string name="information_page_string_eighteen">There\'s a form for that</string>
+    <string name="information_page_string_seventeen">And remember…</string>
+    <string name="information_page_string_eighteen">Your vote counts. Don\'t forget to use it</string>
     <string name="closeInfoScreen">X</string>
     <string name="title_activity_notification">NotificationActivity</string>
     <string name="notificationDayBefore">Remind me the day before</string>
