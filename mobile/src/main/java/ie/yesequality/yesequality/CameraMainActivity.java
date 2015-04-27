@@ -6,6 +6,8 @@ import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,7 +18,9 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,8 +47,8 @@ import java.util.Date;
 import java.util.List;
 
 
-public class CameraMainActivity extends Activity implements SurfaceHolder.Callback, Camera.ShutterCallback, Camera.PictureCallback {
-
+public class CameraMainActivity extends Activity implements SurfaceHolder.Callback,
+        Camera.ShutterCallback, Camera.PictureCallback {
 
     Camera mCamera;
     SurfaceView surfaceView;
@@ -55,7 +59,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     int duration = Toast.LENGTH_SHORT;
     static int pictureWidth = 0;
 
-    ImageView selfieButton, retakeButton, shareButtonBot, shareButton, infoButton, badge;
+    ImageView selfieButton, retakeButton, shareButtonBot, infoButton, badge;
     RelativeLayout surfaceLayout;
 
     private int[] mVoteBadges = new int[]{R.drawable.ic_vote_for_me,
@@ -80,28 +84,31 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         setContentView(R.layout.surface_camera_layout);
 
-        //   setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
         getWindow().setFormat(PixelFormat.UNKNOWN);
         surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
 
 
         int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
         int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
-
-
         pictureWidth = screenWidth;
 
+        //TODO (jos) calculate the size of the other elements.
+        // 1 Top is always the same size
+        // 2 Camera is square and it is screenWidth x screenWidth
+        // 3 The rest is used by the bottom layer
+        //   That means: heightBottom = screenHeight - screenTop - screenWidth.
+
         surfaceLayout = (RelativeLayout) findViewById(R.id.surface_layout);
-        LayoutParams params = surfaceLayout.getLayoutParams();
-        params.height = screenWidth;
-        params.width = screenWidth;
+//        LayoutParams params = surfaceLayout.getLayoutParams();
+//        params.height = screenHeight;
+//        params.width = screenWidth;
 
         int usable = screenHeight - screenWidth;
 
 
         LinearLayout topLayout = (LinearLayout) findViewById(R.id.top_bar);
         LayoutParams paramsTop = topLayout.getLayoutParams();
+
         // paramsTop.height = usable/3;
         // paramsTop.width = usable/2;
 
@@ -124,8 +131,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         controlInflater = LayoutInflater.from(getBaseContext());
         // View viewControl = controlInflater.inflate(R.layout.custom_camera, null);
-        ActionBar.LayoutParams layoutParamsControl = new ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT,
-                ActionBar.LayoutParams.FILL_PARENT);
+//        ActionBar.LayoutParams layoutParamsControl = new ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT,
+//                ActionBar.LayoutParams.FILL_PARENT);
         // this.addContentView(viewControl, layoutParamsControl);
 
 
@@ -144,10 +151,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         retakeButton = (ImageView) findViewById(R.id.retakeButton);
         retakeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // your code here
-
                 retakeLogic();
-                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
             }
         });
 
@@ -155,20 +159,10 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         shareButtonBot = (ImageView) findViewById(R.id.shareButtonBotom);
         shareButtonBot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // your code here
                 shareIt();
-
-                // mCamera.takePicture(CameraMainActivity.this, null, null, CameraMainActivity.this);
             }
         });
 
-        shareButton = (ImageView) findViewById(R.id.shareButton);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(CameraMainActivity.this, NotificationActivity.class);
-                startActivity(intent);
-            }
-        });
 
         infoButton = (ImageView) findViewById(R.id.moreInfoButton);
         infoButton.setOnClickListener(new View.OnClickListener() {
@@ -207,20 +201,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         });
 
         surfaceLayout.setOnDragListener(new BadgeDragListener());
-    }
-
-    private final class BadgeTouchListener implements View.OnTouchListener {
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                view.startDrag(data, shadowBuilder, view, 0);
-                view.setVisibility(View.INVISIBLE);
-                return true;
-            } else {
-                return false;
-            }
-        }
     }
 
     private final class BadgeDragListener implements View.OnDragListener {
@@ -271,7 +251,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         startActivity(Intent.createChooser(share, "Share Image"));
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -298,12 +277,9 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-
         if (mCamera != null) {
             try {
-
                 mCamera.setPreviewDisplay(surfaceHolder);
-
                 mCamera.startPreview();
                 previewing = true;
             } catch (Exception e) {
@@ -315,22 +291,16 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
-
         selfieButton.setVisibility(View.VISIBLE);
         retakeButton.setVisibility(View.INVISIBLE);
         shareButtonBot.setVisibility(View.INVISIBLE);
 
         if (Camera.getNumberOfCameras() >= 2) {
-
-            //if you want to open front facing camera use this line
             try {
                 mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
             } catch (Exception ex) {
                 Toast.makeText(this, "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
             }
-            //if you want to use the back facing camera
-            // camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
         } else {
             try {
                 mCamera = Camera.open();
@@ -356,41 +326,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         selfieButton.setVisibility(View.VISIBLE);
         retakeButton.setVisibility(View.INVISIBLE);
         shareButtonBot.setVisibility(View.INVISIBLE);
-
-    }
-
-    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
-        final double ASPECT_TOLERANCE = 0.05;
-        double targetRatio = (double) w / h;
-
-        if (sizes == null) return null;
-
-        Camera.Size optimalSize = null;
-
-        double minDiff = Double.MAX_VALUE;
-
-        int targetHeight = h;
-
-        // Find size
-        for (Camera.Size size : sizes) {
-            double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
-                optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
-            }
-        }
-        return optimalSize;
     }
 
 
@@ -405,12 +340,21 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         // set the badge position and dimension, to match the one from the camera preview
         Matrix matrixBmp2 = new Matrix();
-        matrixBmp2.postTranslate(badge.getX(), badge.getY());
+        //TODO (jos) pass the size of the action bar instead of calculating it again
+        //Size of the action bar which we use for the top bar (see layout)
+        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize });
+        int mActionBarSize = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+        matrixBmp2.postTranslate(badge.getX(), badge.getY() - mActionBarSize);
 
+        //TODO (jos) badge has to be scaled or will be grabbed as is form resources.
         Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2,
                 badge.getWidth(),
                 badge.getHeight(),
                 true);
+//        Bitmap scaledBadge = Bitmap.createBitmap(bmp2, mActionBarSize, 0,
+//                bmp2.getHeight(), bmp2.getWidth());
 
         canvas.drawBitmap(bmp1, matrixBmp1, null);
         canvas.drawBitmap(scaledBadge, matrixBmp2, null);
@@ -427,8 +371,35 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         matrix.postRotate(-90);
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original, width, height, true);
+//        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original, width, height, true);
+        //Size of the action bar which we use for the top bar (see layout)
+        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize });
+        int mActionBarSize = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+        // Size of the bottom panel is 200dp
+        int bottomPanelHeight = (int)((200 * getResources().getDisplayMetrics().density) + 0.5);
+//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+//        int bottomPanelHeight = Math.round(200 * (displayMetrics.ydpi / DisplayMetrics.DENSITY_DEFAULT));
 
+        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
+        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
+        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
+        Log.d("CameraActivity", " the size of the bottom panel is " + bottomPanelHeight);
+        Log.d("CameraActivity", " the width passed is " + original.getWidth());
+        Log.d("CameraActivity", " the height passed is " + original.getHeight());
+        Log.d("CameraActivity", " the width and height passed is " + width);
+//        int photoWidthAndHeight = original.getWidth() - mActionBarSize - bottomPanelHeight - 1;
+//        Log.d("CameraActivity", " The total for the pictures is " + photoWidthAndHeight);
+//        Bitmap scaledBitmap = Bitmap.createBitmap(original, 0, mActionBarSize,
+//                photoWidthAndHeight, photoWidthAndHeight, matrix, true);
+
+//        Bitmap.createBitmap(original, original.getWidth(), 0, width - original.getWidth(), height - original.getHeight());
+        Bitmap scaledBitmap = Bitmap.createBitmap(original, mActionBarSize, 0,
+                original.getHeight(), original.getHeight());
+
+
+        //TODO (jos) width and height are the same, this thing does not do anything!
         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
         Bitmap waterMark = ((BitmapDrawable) badge.getDrawable()).getBitmap();
@@ -444,21 +415,16 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
 
-
         data = resizeImageAndWaterMark(data, pictureWidth, pictureWidth);
-
 
         selfieButton.setVisibility(View.INVISIBLE);
         retakeButton.setVisibility(View.VISIBLE);
         shareButtonBot.setVisibility(View.VISIBLE);
 
-
         try {
-
             Date now = new Date();
             long nowLong = now.getTime() / 9000;
             String fname = getPhotoDirectory(CameraMainActivity.this) + "/yesequal.jpg";
-
 
             File ld = new File(getPhotoDirectory(CameraMainActivity.this));
             if (ld.exists()) {
@@ -489,28 +455,21 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
 
     public void retakeLogic() {
-
         selfieButton.setVisibility(View.VISIBLE);
         retakeButton.setVisibility(View.INVISIBLE);
         shareButtonBot.setVisibility(View.INVISIBLE);
-
         if (mCamera != null) {
             mCamera.startPreview();
         }
-
     }
 
 
     public static String getPhotoDirectory(Context context) {
-        //return Environment.getExternalStorageDirectory().getPath() +"/cbo-up";
-        //return context.getExternalCacheDir().getPath();
         return context.getExternalFilesDir(null).getPath();
     }
 
     @Override
     public void onShutter() {
-
-        Toast.makeText(CameraMainActivity.this, "Selfie Time! :)", duration).show();
-
+        Toast.makeText(CameraMainActivity.this, "Share your picture!", duration).show();
     }
 }
