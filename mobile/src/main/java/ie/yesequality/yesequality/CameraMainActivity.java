@@ -13,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -39,18 +40,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 public class CameraMainActivity extends Activity implements SurfaceHolder.Callback,
         Camera.ShutterCallback, Camera.PictureCallback {
 
+    static int pictureWidth = 0;
     Camera mCamera;
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     boolean previewing = false;
     LayoutInflater controlInflater = null;
-
     int duration = Toast.LENGTH_SHORT;
-    static int pictureWidth = 0;
     int bottomPanelSize = 0;
     int topPanelSize = 0;
 
@@ -69,6 +68,10 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             R.drawable.ic_yes_color
     };
     private int mSelectedBadge = 0;
+
+    public static String getPhotoDirectory(Context context) {
+        return context.getExternalFilesDir(null).getPath();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,24 +179,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         surfaceLayout.setOnDragListener(new BadgeDragListener());
     }
 
-    private final class BadgeDragListener implements View.OnDragListener {
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            int action = event.getAction();
-            switch (action) {
-                case DragEvent.ACTION_DROP:
-                    View view = (View) event.getLocalState();
-                    view.setX(event.getX() - (view.getWidth() / 2));
-                    view.setY(event.getY() - (view.getHeight() / 2));
-                    view.setVisibility(View.VISIBLE);
-                    break;
-                default:
-                    break;
-            }
-            return true;
-        }
-    }
-
     private void shareIt() {
 
         String fname = getPhotoDirectory(CameraMainActivity.this) + "/yesequal.jpg";
@@ -283,7 +268,12 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         }
 
         if (mCamera != null) {
-            mCamera.setDisplayOrientation(90);
+            //nexus 6 camera upside down so I presume it's the same for all Motorola devices
+            if (Build.MANUFACTURER.equalsIgnoreCase("Motorola")) {
+                mCamera.setDisplayOrientation(270);
+            } else {
+                mCamera.setDisplayOrientation(90);
+            }
         }
     }
 
@@ -352,23 +342,27 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
 
         Matrix matrix = new Matrix();
-        matrix.postRotate(-90);
+        if (!Build.MANUFACTURER.equalsIgnoreCase("Motorola")) {
+            matrix.postRotate(-90);
+        } else {
+            matrix.postRotate(-270);
+        }
 
         Log.d("CameraActivity", " the size of the action bar is: " + topPanelSize);
         Log.d("CameraActivity", " the original width  is " + original.getWidth());
         Log.d("CameraActivity", " the original height is " + original.getHeight());
         Bitmap scaledBitmap = Bitmap.createBitmap(original, topPanelSize, 0,
-                original.getHeight(), original.getHeight());
+                original.getHeight(), original.getHeight(), matrix, true);
 
         //TODO (jos) width and height are the same, this thing does not do anything!???
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+//        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
         Bitmap waterMark = ((BitmapDrawable) badge.getDrawable()).getBitmap();
 
-        rotatedBitmap = overlay(rotatedBitmap, waterMark);
+        scaledBitmap = overlay(scaledBitmap, waterMark);
 
         ByteArrayOutputStream blob = new ByteArrayOutputStream();
-        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, blob);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, blob);
 
         return blob.toByteArray();
     }
@@ -421,13 +415,26 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         }
     }
 
-
-    public static String getPhotoDirectory(Context context) {
-        return context.getExternalFilesDir(null).getPath();
-    }
-
     @Override
     public void onShutter() {
         Toast.makeText(CameraMainActivity.this, "Share your picture!", duration).show();
+    }
+
+    private final class BadgeDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            int action = event.getAction();
+            switch (action) {
+                case DragEvent.ACTION_DROP:
+                    View view = (View) event.getLocalState();
+                    view.setX(event.getX() - (view.getWidth() / 2));
+                    view.setY(event.getY() - (view.getHeight() / 2));
+                    view.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
     }
 }
