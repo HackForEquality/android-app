@@ -56,5 +56,6 @@
     <string name="dontForgetDayBefore">Tell your friends, tell everybody to vote YES tomorrow!</string>
     <string name="dontForgetTitle">Don\'t Forget!</string>
     <string name="okButtonNotifications">OK</string>
+    <string name="title_activity_camera_main2">CameraMain2Activity</string>
 
 </resources>
