@@ -1,12 +1,10 @@
 package ie.yesequality.yesequality;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,17 +16,15 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,8 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
-import java.util.List;
 
 
 public class CameraMainActivity extends Activity implements SurfaceHolder.Callback,
@@ -58,6 +52,8 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
     int duration = Toast.LENGTH_SHORT;
     static int pictureWidth = 0;
+    int bottomPanelSize = 0;
+    int topPanelSize = 0;
 
     ImageView selfieButton, retakeButton, shareButtonBot, infoButton, badge;
     RelativeLayout surfaceLayout;
@@ -92,49 +88,24 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
         pictureWidth = screenWidth;
 
-        //TODO (jos) calculate the size of the other elements.
-        // 1 Top is always the same size
-        // 2 Camera is square and it is screenWidth x screenWidth
-        // 3 The rest is used by the bottom layer
-        //   That means: heightBottom = screenHeight - screenTop - screenWidth.
-
         surfaceLayout = (RelativeLayout) findViewById(R.id.surface_layout);
-//        LayoutParams params = surfaceLayout.getLayoutParams();
-//        params.height = screenHeight;
-//        params.width = screenWidth;
-
-        int usable = screenHeight - screenWidth;
-
 
         LinearLayout topLayout = (LinearLayout) findViewById(R.id.top_bar);
         LayoutParams paramsTop = topLayout.getLayoutParams();
-
-        // paramsTop.height = usable/3;
-        // paramsTop.width = usable/2;
+        topPanelSize = paramsTop.height;
+        Log.e("CameraActivity", "Top bar height is: " + topPanelSize);
+        bottomPanelSize = screenHeight - topPanelSize - screenWidth;
+        Log.e("CameraActivity", "Top bottomsize is: " + bottomPanelSize);
 
         LinearLayout bottomLayout = (LinearLayout) findViewById(R.id.bottom_bar);
         LayoutParams paramsBot = bottomLayout.getLayoutParams();
-        paramsBot.height = usable - paramsTop.height;
-        // paramsBot.width = usable/2;
-
-
-        //  surfaceLayout.setLayoutParams(params);
-
-        //Get the width of the screen
-        //  int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
-
+        paramsBot.height = bottomPanelSize;
 
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-
         controlInflater = LayoutInflater.from(getBaseContext());
-        // View viewControl = controlInflater.inflate(R.layout.custom_camera, null);
-//        ActionBar.LayoutParams layoutParamsControl = new ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT,
-//                ActionBar.LayoutParams.FILL_PARENT);
-        // this.addContentView(viewControl, layoutParamsControl);
-
 
         selfieButton = (ImageView) findViewById(R.id.selfieButton);
         selfieButton.setOnClickListener(new View.OnClickListener() {
@@ -173,6 +144,9 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         });
 
         badge = (ImageView) findViewById(R.id.waterMarkPic);
+        ViewGroup.MarginLayoutParams badgeLP = (ViewGroup.MarginLayoutParams) badge.getLayoutParams();
+        badgeLP.bottomMargin = bottomPanelSize;
+        badge.setLayoutParams(badgeLP);
         badge.setOnDragListener(new BadgeDragListener());
 
         badge.setOnLongClickListener(new View.OnLongClickListener() {
@@ -333,6 +307,20 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
 
+        // The badge is 150dp x 150dp
+        Log.e("CameraActivity", "bmp2 height is: " + bmp2.getHeight());
+        Log.e("CameraActivity", "bmp2 width is: " + bmp2.getWidth());
+        // A lot of magic numbers in here; trial an error mostly.
+        // There are two sizes of badges (changing in height)
+        // These should be calculated automatically instead of hardcoding them here
+        // 320 x 275 ---> 150 x 129
+        // 320 x 121 ---> 150 x 57
+        int widthScale = 150;
+        int heightScale = 129;
+        if(bmp2.getHeight() != 275) {
+            heightScale = 57;
+        }
+
         // mirror the camera snapshot to match the camera preview
         Matrix matrixBmp1 = new Matrix();
         matrixBmp1.setScale(-1, 1);
@@ -340,21 +328,17 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         // set the badge position and dimension, to match the one from the camera preview
         Matrix matrixBmp2 = new Matrix();
-        //TODO (jos) pass the size of the action bar instead of calculating it again
-        //Size of the action bar which we use for the top bar (see layout)
-        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
-                new int[] { android.R.attr.actionBarSize });
-        int mActionBarSize = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
-        matrixBmp2.postTranslate(badge.getX(), badge.getY() - mActionBarSize);
+        if(heightScale == 57) { // I have no idea why this correction is needed for smaller badges
+            Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
+            Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
+            Log.e("CameraActivity", "old bottomsize is: " + bottomPanelSize);
+            bottomPanelSize -= 26;
+            Log.e("CameraActivity", "new bottomsize is: " + bottomPanelSize);
+        }
+        matrixBmp2.postTranslate(badge.getX(), badge.getY() - bottomPanelSize);
 
-        //TODO (jos) badge has to be scaled or will be grabbed as is form resources.
-        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2,
-                badge.getWidth(),
-                badge.getHeight(),
-                true);
-//        Bitmap scaledBadge = Bitmap.createBitmap(bmp2, mActionBarSize, 0,
-//                bmp2.getHeight(), bmp2.getWidth());
+        // Badge has to be scaled or will be grabbed as is form resources.
+        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, heightScale, true);
 
         canvas.drawBitmap(bmp1, matrixBmp1, null);
         canvas.drawBitmap(scaledBadge, matrixBmp2, null);
@@ -363,43 +347,19 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     }
 
 
-    byte[] resizeImageAndWaterMark(byte[] input, int width, int height) {
+    byte[] resizeImageAndWaterMark(byte[] input) {
         Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
-        //  Bitmap resized = Bitmap.createScaledBitmap(original, width, height, true);
 
         Matrix matrix = new Matrix();
-
         matrix.postRotate(-90);
 
-//        Bitmap scaledBitmap = Bitmap.createScaledBitmap(original, width, height, true);
-        //Size of the action bar which we use for the top bar (see layout)
-        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
-                new int[] { android.R.attr.actionBarSize });
-        int mActionBarSize = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
-        // Size of the bottom panel is 200dp
-        int bottomPanelHeight = (int)((200 * getResources().getDisplayMetrics().density) + 0.5);
-//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-//        int bottomPanelHeight = Math.round(200 * (displayMetrics.ydpi / DisplayMetrics.DENSITY_DEFAULT));
-
-        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
-        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
-        Log.d("CameraActivity", " the size of the action bar is: " + mActionBarSize);
-        Log.d("CameraActivity", " the size of the bottom panel is " + bottomPanelHeight);
-        Log.d("CameraActivity", " the width passed is " + original.getWidth());
-        Log.d("CameraActivity", " the height passed is " + original.getHeight());
-        Log.d("CameraActivity", " the width and height passed is " + width);
-//        int photoWidthAndHeight = original.getWidth() - mActionBarSize - bottomPanelHeight - 1;
-//        Log.d("CameraActivity", " The total for the pictures is " + photoWidthAndHeight);
-//        Bitmap scaledBitmap = Bitmap.createBitmap(original, 0, mActionBarSize,
-//                photoWidthAndHeight, photoWidthAndHeight, matrix, true);
-
-//        Bitmap.createBitmap(original, original.getWidth(), 0, width - original.getWidth(), height - original.getHeight());
-        Bitmap scaledBitmap = Bitmap.createBitmap(original, mActionBarSize, 0,
+        Log.d("CameraActivity", " the size of the action bar is: " + topPanelSize);
+        Log.d("CameraActivity", " the original width  is " + original.getWidth());
+        Log.d("CameraActivity", " the original height is " + original.getHeight());
+        Bitmap scaledBitmap = Bitmap.createBitmap(original, topPanelSize, 0,
                 original.getHeight(), original.getHeight());
 
-
-        //TODO (jos) width and height are the same, this thing does not do anything!
+        //TODO (jos) width and height are the same, this thing does not do anything!???
         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
         Bitmap waterMark = ((BitmapDrawable) badge.getDrawable()).getBitmap();
@@ -415,15 +375,13 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
 
-        data = resizeImageAndWaterMark(data, pictureWidth, pictureWidth);
+        data = resizeImageAndWaterMark(data);
 
         selfieButton.setVisibility(View.INVISIBLE);
         retakeButton.setVisibility(View.VISIBLE);
         shareButtonBot.setVisibility(View.VISIBLE);
 
         try {
-            Date now = new Date();
-            long nowLong = now.getTime() / 9000;
             String fname = getPhotoDirectory(CameraMainActivity.this) + "/yesequal.jpg";
 
             File ld = new File(getPhotoDirectory(CameraMainActivity.this));
@@ -449,7 +407,6 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             e.printStackTrace();
             Toast.makeText(CameraMainActivity.this, "IO EXCEPTION", duration).show();
         }
-        //  camera.startPreview();
 
     }
 
