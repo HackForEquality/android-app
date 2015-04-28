@@ -53,7 +53,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
     int bottomPanelSize = 0;
     int topPanelSize = 0;
 
-    ImageView selfieButton, retakeButton, shareButtonBot, infoButton, badge;
+    ImageView selfieButton, retakeButton, shareButtonBot, reminderButton, infoButton, badge;
     RelativeLayout surfaceLayout;
 
     private int[] mVoteBadges = new int[]{R.drawable.ic_vote_for_me,
@@ -141,6 +141,14 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         infoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(CameraMainActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        reminderButton = (ImageView) findViewById(R.id.reminderButton);
+        reminderButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(CameraMainActivity.this, NotificationActivity.class);
                 startActivity(intent);
             }
         });

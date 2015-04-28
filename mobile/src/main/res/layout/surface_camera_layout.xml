@@ -55,7 +55,7 @@
             android:layout_weight=".6" />
 
         <ImageView
-            android:id="@+id/shareButton"
+            android:id="@+id/reminderButton"
             android:layout_height="fill_parent"
             android:layout_width="0dp"
             android:layout_weight=".15"
