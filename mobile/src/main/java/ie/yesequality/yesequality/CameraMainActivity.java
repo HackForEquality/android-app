@@ -5,7 +5,6 @@ import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -317,7 +316,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         // 320 x 121 ---> 150 x 57
         int widthScale = 150;
         int heightScale = 129;
-        if(bmp2.getHeight() != 275) {
+        if (bmp2.getHeight() != 275) {
             heightScale = 57;
         }
 
@@ -328,17 +327,19 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
 
         // set the badge position and dimension, to match the one from the camera preview
         Matrix matrixBmp2 = new Matrix();
-        if(heightScale == 57) { // I have no idea why this correction is needed for smaller badges
-            Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
+        if (heightScale == 57) { // I have no idea why this correction is needed for smaller badges
             Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
             Log.e("CameraActivity", "old bottomsize is: " + bottomPanelSize);
             bottomPanelSize -= 26;
             Log.e("CameraActivity", "new bottomsize is: " + bottomPanelSize);
         }
-        matrixBmp2.postTranslate(badge.getX(), badge.getY() - bottomPanelSize);
+        matrixBmp2.postTranslate(badge.getX(), badge.getY());
 
         // Badge has to be scaled or will be grabbed as is form resources.
-        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, heightScale, true);
+        // preserve badge aspect ratio
+        float badgeScaleIdx = bmp2.getWidth() / bmp2.getHeight();
+
+        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, Math.round(widthScale * badgeScaleIdx), true);
 
         canvas.drawBitmap(bmp1, matrixBmp1, null);
         canvas.drawBitmap(scaledBadge, matrixBmp2, null);
