@@ -304,7 +304,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         // These should be calculated automatically instead of hardcoding them here
         // 320 x 275 ---> 150 x 129
         // 320 x 121 ---> 150 x 57
-        int widthScale = 150;
+        int widthScale = 300;
         int heightScale = 129;
         if (bmp2.getHeight() != 275) {
             heightScale = 57;
@@ -323,11 +323,12 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
             bottomPanelSize -= 26;
             Log.e("CameraActivity", "new bottomsize is: " + bottomPanelSize);
         }
-        matrixBmp2.postTranslate(badge.getX(), badge.getY());
-
         // Badge has to be scaled or will be grabbed as is form resources.
         // preserve badge aspect ratio
         float badgeScaleIdx = bmp2.getWidth() / bmp2.getHeight();
+
+        // more magic here. It "works", so leaving like that for now. Too tired for a proper solution
+        matrixBmp2.postTranslate(badge.getX(), badge.getY() - (Math.round(widthScale * badgeScaleIdx) / 2));
 
         Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, Math.round(widthScale * badgeScaleIdx), true);
 
