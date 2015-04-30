@@ -2,6 +2,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ie.yesequality.yesequality.CameraMainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_info"
+        android:icon="@drawable/ic_action_info"
+        android:orderInCategory="100"
+        android:title="information"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_reminders"
+        android:icon="@drawable/ic_reminders"
+        android:orderInCategory="101"
+        android:title="reminder"
+        app:showAsAction="always"/>
 </menu>

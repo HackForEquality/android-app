@@ -90,7 +90,7 @@ public class CameraMainActivity extends Activity implements SurfaceHolder.Callba
         int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
         pictureWidth = screenWidth;
 
-        surfaceLayout = (RelativeLayout) findViewById(R.id.surface_layout);
+        surfaceLayout = (RelativeLayout) findViewById(R.id.rlSurfaceLayout);
 
         LinearLayout topLayout = (LinearLayout) findViewById(R.id.top_bar);
         LayoutParams paramsTop = topLayout.getLayoutParams();
