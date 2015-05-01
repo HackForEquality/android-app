@@ -3,9 +3,10 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:gravity="center"
               android:orientation="vertical">
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -21,11 +22,9 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_alignBottom="@+id/photo"
-            android:layout_marginBottom="100dp"
-            android:layout_marginLeft="20dp"
             android:src="@drawable/ic_vote_for_me"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
-    </RelativeLayout>
+    </FrameLayout>
 
 </LinearLayout>

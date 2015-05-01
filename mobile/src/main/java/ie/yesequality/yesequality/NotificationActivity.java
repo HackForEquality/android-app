@@ -1,50 +1,49 @@
 package ie.yesequality.yesequality;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.CompoundButton;
-import android.widget.Switch;
+
 import java.util.Calendar;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import ie.yesequality.yesequality.broadcastreceivers.NotificationReceiver;
 
 
-public class NotificationActivity extends Activity {
+public class NotificationActivity extends ActionBarActivity {
 
-    private static final String PREFS = "REMINDERS";
     public static final String ON_DAY = "on_day";
     public static final String ON_DAY_BEFORE = "on_day_before";
     public static final int ALARM_ID_ON_DAY = 220315;
     public static final int ALARM_ID_ON_DAY_BEFORE = 210315;
-
+    private static final String PREFS = "REMINDERS";
+    @InjectView(R.id.switchDayBefore)
+    protected SwitchCompat dayBefore;
+    @InjectView(R.id.switchOnDay)
+    protected SwitchCompat onDay;
     private AlarmManager alarmManagerOnDay;
     private AlarmManager alarmManagerOnDayBefore;
     private PendingIntent alarmIntentOnDay;
     private PendingIntent alarmIntentOnDayBefore;
-    @InjectView(R.id.switchDayBefore) Switch dayBefore;
-    @InjectView(R.id.switchOnDay) Switch onDay;
-
-    @OnClick(R.id.okButton)
-    public void closeScreen() {
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         ButterKnife.inject(this);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dark_cyan)));
 
         final SharedPreferences notificationPrefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = notificationPrefs.edit();
@@ -136,26 +135,4 @@ public class NotificationActivity extends Activity {
         }
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_notification, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

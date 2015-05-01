@@ -1,16 +1,13 @@
 package ie.yesequality.yesequality;
 
 import android.content.ClipData;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.DragEvent;
@@ -24,7 +21,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -40,6 +36,8 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
     protected RelativeLayout rlSurfaceLayout;
     @InjectView(R.id.ivWaterMarkPic)
     protected ImageView ivWaterMarkPic;
+    @InjectView(R.id.selfieButton)
+    protected ImageView selfieButton;
     private boolean isFinishedPhotoCapture = false;
 
 
@@ -135,35 +133,41 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
 
     }
 
-    private void shareIt() {
-
-        String fname = getPhotoDirectory(this) + "/yesequal.jpg";
-
-        Bitmap myfile = BitmapFactory.decodeFile(fname);
-
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/jpeg");
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "title");
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                values);
-
-
-        OutputStream outstream;
-        try {
-            outstream = getContentResolver().openOutputStream(uri);
-            myfile.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
-            outstream.close();
-        } catch (Exception e) {
-            System.err.println(e.toString());
-
-        }
-
-        share.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(share, "Share Image"));
+    @Override
+    protected void onResume() {
+        super.onResume();
+        selfieButton.setEnabled(true);
     }
+
+    //    private void shareIt() {
+//
+//        String fname = getPhotoDirectory(this) + "/yesequal.jpg";
+//
+//        Bitmap myfile = BitmapFactory.decodeFile(fname);
+//
+//        Intent share = new Intent(Intent.ACTION_SEND);
+//        share.setType("image/jpeg");
+//
+//        ContentValues values = new ContentValues();
+//        values.put(MediaStore.Images.Media.TITLE, "title");
+//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+//        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                values);
+//
+//
+//        OutputStream outstream;
+//        try {
+//            outstream = getContentResolver().openOutputStream(uri);
+//            myfile.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
+//            outstream.close();
+//        } catch (Exception e) {
+//            System.err.println(e.toString());
+//
+//        }
+//
+//        share.putExtra(Intent.EXTRA_STREAM, uri);
+//        startActivity(Intent.createChooser(share, "Share Image"));
+//    }
 
     /**
      * On fragment notifying about a non-recoverable problem with the camera.
@@ -193,86 +197,13 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
         fragment.takePicture();
     }
 
-    public void swapCamera(View view) {
-        CameraFragment fragment = (CameraFragment) getSupportFragmentManager().findFragmentById(R.id.camera_fragment);
-        fragment.swapCamera();
-    }
-
-    public void swapFlash(View view) {
-        CameraFragment fragment = (CameraFragment) getSupportFragmentManager().findFragmentById(R.id.camera_fragment);
-        fragment.swapFlash();
-    }
 
 
-//    private Bitmap overlay(Bitmap bmp, Bitmap bmpBadge) {
-//        Bitmap bmOverlay = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
-//        Canvas canvas = new Canvas(bmOverlay);
-//
-
-//        Matrix matrixBmp1 = new Matrix();
-//        matrixBmp1.postTranslate(bmp1.getWidth(), 0);
-//
-//        Matrix matrixBmp2 = new Matrix();
-//
-//        // Badge has to be scaled or will be grabbed as is form resources.
-//        // preserve badge aspect ratio
-////        float badgeScaleIdx = bmp2.getWidth() / bmp2.getHeight();
-//
-//        // more magic here. It "works", so leaving like that for now. Too tired for a proper solution
-//        matrixBmp2.postTranslate(ivWaterMarkPic.getX(), ivWaterMarkPic.getY());
-//
-//        canvas.drawBitmap(bmp1, matrixBmp1, null);
-//        canvas.drawBitmap(bmp2, matrixBmp2, null);
-//
-//        canvas.drawBitmap(bmp, new Matrix(), null);
-//        canvas.drawBitmap(bmpBadge, new Matrix(), null);
-//        return bmOverlay;
-//    }
 
     /**
      * A picture has been taken.
      */
     public void onPictureTaken(Bitmap bitmap) {
-//        Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
-//
-//        bitmap = overlay(bitmap, waterMark);
-//
-//
-//        try {
-//            String fname = getPhotoDirectory(this) + "/yesequal.jpg";
-//
-//            File ld = new File(getPhotoDirectory(this));
-//            if (ld.exists()) {
-//                if (!ld.isDirectory()) {
-//                    finish();
-//                }
-//            } else {
-//                ld.mkdir();
-//            }
-//
-////            Log.d("YES", "open output stream " + fname + " : " + data.length);
-//
-//            OutputStream os = new FileOutputStream(fname);
-//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//            byte[] byteArray = stream.toByteArray();
-//            os.write(byteArray, 0, byteArray.length);
-//            os.close();
-//
-//
-//        } catch (FileNotFoundException e) {
-//            Toast.makeText(this, "FILE NOT FOUND !", Toast.LENGTH_SHORT).show();
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Toast.makeText(this, "IO EXCEPTION", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        isFinishedPhotoCapture = true;
-//        invalidateOptionsMenu();
-
-        /////////
-
         File mediaStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES

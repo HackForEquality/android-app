@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Yes Equality</string>
 
-    <string name="title_activity_camera_main">Yes For Equality</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_camera_main">Yes Equality</string>
+    <string name="title_activity_main">Information</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -49,7 +49,7 @@
     <string name="information_page_string_seventeen">And remember…</string>
     <string name="information_page_string_eighteen">Your vote counts. Don\'t forget to use it</string>
     <string name="closeInfoScreen">X</string>
-    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_notification">Dont Forget!</string>
     <string name="notificationDayBefore">Remind me the day before</string>
     <string name="NotificationOnDay">Remind me on the day</string>
     <string name="dontForgetOnDay">Don\'t forget to vote YES</string>

@@ -4,13 +4,14 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ShareActionProvider;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -83,6 +84,8 @@ public class PhotoActivity extends ActionBarActivity {
 
         photo.setOnDragListener(new BadgeDragListener());
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
     }
 
@@ -90,13 +93,13 @@ public class PhotoActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_picture, menu);
 
-//        initializeShareAction(menu.findItem(R.id.action_share));
+        initializeShareAction(menu.findItem(R.id.action_share));
 
         return super.onCreateOptionsMenu(menu);
     }
 
     private void initializeShareAction(MenuItem shareItem) {
-        ShareActionProvider shareProvider = (ShareActionProvider) shareItem.getActionProvider();
+        ShareActionProvider shareProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -111,6 +114,8 @@ public class PhotoActivity extends ActionBarActivity {
         public boolean onDrag(View v, DragEvent event) {
             int action = event.getAction();
             switch (action) {
+                case DragEvent.ACTION_DRAG_STARTED:
+
                 case DragEvent.ACTION_DROP:
                     View view = (View) event.getLocalState();
                     view.setX(event.getX() - (view.getWidth() / 2));

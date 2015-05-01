@@ -1,9 +1,10 @@
 package ie.yesequality.yesequality;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
 import com.viewpagerindicator.CirclePageIndicator;
@@ -13,9 +14,8 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity implements PageAdapter.PagerListener {
 
 
     @InjectView(R.id.indicator)
@@ -34,7 +34,7 @@ public class MainActivity extends FragmentActivity {
         List<Fragment> fragments = getFragmentList();
 
 
-        mPageAdapter = new PageAdapter(getSupportFragmentManager(), fragments);
+        mPageAdapter = new PageAdapter(getSupportFragmentManager(), fragments, this);
 
 
         pager.setAdapter(mPageAdapter);
@@ -42,14 +42,14 @@ public class MainActivity extends FragmentActivity {
 
         indicator.setViewPager(pager);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lilac)));
+
 
 
     }
 
-    @OnClick(R.id.closeInfoButton)
-    protected void onCloseInfoClicked() {
-        finish();
-    }
 
 
     private List<Fragment> getFragmentList() {
@@ -95,6 +95,46 @@ public class MainActivity extends FragmentActivity {
                 R.color.white, "http://www.yesequality.ie", R.color.black));
 
         return fragments;
+    }
+
+    @Override
+    public void getPosition(int position) {
+        ColorDrawable colorDrawable;
+        switch (position) {
+            case 1:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
+                break;
+            case 2:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_cyan));
+                break;
+            case 3:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.navy));
+                break;
+            case 4:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
+                break;
+            case 5:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_navy));
+                break;
+            case 6:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_green));
+                break;
+            case 7:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_magenta));
+                break;
+            case 8:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_red));
+                break;
+            case 9:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
+                break;
+            default:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
+                break;
+        }
+
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
+
     }
 
     public class DepthPageTransformer implements ViewPager.PageTransformer {

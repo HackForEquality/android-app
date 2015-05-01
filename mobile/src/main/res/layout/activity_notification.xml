@@ -1,88 +1,88 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+                android:layout_height="match_parent"
+                android:background="@color/dark_cyan"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@color/dark_cyan"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ie.yesequality.yesequality.NotificationActivity">
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switchDayBefore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/notificationDayBefore"
-        android:id="@+id/switchDayBefore"
-        android:layout_marginTop="113dp"
-        android:textStyle="bold"
-        android:layout_below="@+id/switchOnDay"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/switchOnDay"
+        android:layout_marginTop="113dp"
         android:checked="true"
-        android:textColor="#ffffff" />
+        android:text="@string/notificationDayBefore"
+        android:textColor="#ffffff"
+        android:textStyle="bold"/>
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switchOnDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/NotificationOnDay"
-        android:id="@+id/switchOnDay"
-        android:layout_marginTop="46dp"
-        android:textStyle="bold"
-        android:layout_below="@+id/dontForgetTextView"
-        android:layout_alignRight="@+id/switchDayBefore"
         android:layout_alignEnd="@+id/switchDayBefore"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/switchDayBefore"
+        android:layout_marginTop="46dp"
         android:checked="true"
-        android:textColor="#ffffff" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/dark_green"
+        android:text="@string/NotificationOnDay"
         android:textColor="#ffffff"
-        android:text="@string/okButtonNotifications"
-        android:id="@+id/okButton"
-        android:layout_below="@+id/switchDayBefore"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="143dp" />
+        android:textStyle="bold"/>
+
+    <!--<Button-->
+    <!--style="?android:attr/buttonStyleSmall"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@color/dark_green"-->
+    <!--android:textColor="#ffffff"-->
+    <!--android:text="@string/okButtonNotifications"-->
+    <!--android:id="@+id/okButton"-->
+    <!--android:layout_below="@+id/switchDayBefore"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginTop="143dp" />-->
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+    <!--android:text="@string/dontForgetTitle"-->
+    <!--android:id="@+id/dontForgetTextView"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:textColor="#ffffff" />-->
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/dontForgetTitle"
-        android:id="@+id/dontForgetTextView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ffffff" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/dontForgetOnDay"
         android:id="@+id/textView"
-        android:layout_alignRight="@+id/switchOnDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/switchOnDay"
-        android:layout_below="@+id/switchOnDay"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/switchOnDay"
+        android:layout_below="@+id/switchOnDay"
+        android:text="@string/dontForgetOnDay"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#ffffff" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/dontForgetDayBefore"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/switchDayBefore"
-        android:layout_alignRight="@+id/switchDayBefore"
         android:layout_alignEnd="@+id/switchDayBefore"
         android:layout_alignLeft="@+id/switchDayBefore"
+        android:layout_alignRight="@+id/switchDayBefore"
         android:layout_alignStart="@+id/switchDayBefore"
+        android:layout_below="@+id/switchDayBefore"
+        android:text="@string/dontForgetDayBefore"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#ffffff" />
 
 </RelativeLayout>

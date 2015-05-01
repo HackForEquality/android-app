@@ -3,7 +3,9 @@ package ie.yesequality.yesequality;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,7 +15,8 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -33,6 +36,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     private CameraFragmentListener listener;
     private int displayOrientation;
     private int layoutOrientation;
+
+    private ImageView ivWaterMarkPic;
 
     private CameraOrientationListener orientationListener;
 
@@ -181,9 +186,24 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         parameters.setPreviewSize(bestPictureSize.width, bestPreviewSize.height);
         parameters.setPictureSize(bestPictureSize.width, bestPictureSize.height);
 
-        camera.setParameters(parameters);
+        try {
+            camera.setParameters(parameters);
 
-        setFlashButtonState();
+        } catch (Exception ignored) {
+            if (Camera.getNumberOfCameras() >= 2) {
+                try {
+                    camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                } catch (Exception ex) {
+                    Toast.makeText(getActivity(), "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                try {
+                    camera = Camera.open();
+                } catch (Exception ex) {
+                    Toast.makeText(getActivity(), "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private Camera.Size determineBestPreviewSize(Camera.Parameters parameters) {
@@ -229,41 +249,51 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         camera.takePicture(null, null, this);
     }
 
-    public void swapCamera() {
-        if (Camera.getNumberOfCameras() > 1 && cameraId < Camera.getNumberOfCameras() - 1) {
-            cameraId = cameraId + 1;
-        } else {
-            cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-        }
-        startCamera();
-    }
 
-    public void swapFlash() {
-        Camera.Parameters params = camera.getParameters();
-        List<String> flashModes = params.getSupportedFlashModes();
-        if (flashModes == null || flashModes.size() == 0) {
-            return;
-        }
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
 
-        String currentFlashMode = params.getFlashMode();
-        String newFlashMode = currentFlashMode;
-        if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_OFF) && flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
-        } else if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_OFF) && flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_ON;
-        } else if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_AUTO) && flashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_ON;
-        } else if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_AUTO) && flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_OFF;
-        } else if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_ON) && flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_OFF;
-        } else if (currentFlashMode.equals(Camera.Parameters.FLASH_MODE_ON) && flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
-            newFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
+        // The badge is 150dp x 150dp
+        Log.e("CameraActivity", "bmp2 height is: " + bmp2.getHeight());
+        Log.e("CameraActivity", "bmp2 width is: " + bmp2.getWidth());
+        // A lot of magic numbers in here; trial an error mostly.
+        // There are two sizes of badges (changing in height)
+        // These should be calculated automatically instead of hardcoding them here
+        // 320 x 275 ---> 150 x 129
+        // 320 x 121 ---> 150 x 57
+        int widthScale = 300;
+        int heightScale = 129;
+        if (bmp2.getHeight() != 275) {
+            heightScale = 57;
         }
 
-        params.setFlashMode(newFlashMode);
-        camera.setParameters(params);
-        setFlashButtonState();
+        // mirror the camera snapshot to match the camera preview
+        Matrix matrixBmp1 = new Matrix();
+        matrixBmp1.setScale(-1, 1);
+        matrixBmp1.postTranslate(bmp1.getWidth(), 0);
+
+        // set the badge position and dimension, to match the one from the camera preview
+        Matrix matrixBmp2 = new Matrix();
+//        if (heightScale == 57) { // I have no idea why this correction is needed for smaller badges
+//            Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
+//            Log.e("CameraActivity", "old bottomsize is: " + bottomPanelSize);
+//            bottomPanelSize -= 26;
+//            Log.e("CameraActivity", "new bottomsize is: " + bottomPanelSize);
+//        }
+        // Badge has to be scaled or will be grabbed as is form resources.
+        // preserve badge aspect ratio
+        float badgeScaleIdx = bmp2.getWidth() / bmp2.getHeight();
+
+        // more magic here. It "works", so leaving like that for now. Too tired for a proper solution
+        matrixBmp2.postTranslate(ivWaterMarkPic.getX(), ivWaterMarkPic.getY() - (Math.round(widthScale * badgeScaleIdx) / 2));
+
+        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, Math.round(widthScale * badgeScaleIdx), true);
+
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(scaledBadge, matrixBmp2, null);
+
+        return bmOverlay;
     }
 
     /**
@@ -271,7 +301,10 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
      */
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
+
+
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
 
         int rotation = (
                 displayOrientation
@@ -297,6 +330,12 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
             oldBitmap.recycle();
         }
+
+        ivWaterMarkPic = (ImageView) getActivity().findViewById(R.id.ivWaterMarkPic);
+
+        Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
+
+        bitmap = overlay(bitmap, waterMark);
 
         bitmap = cropBitmapToSquare(bitmap);
 
@@ -354,6 +393,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         if (camera != null) {
             stopCamera();
         }
+
+
         camera = Camera.open(cameraId);
         startCameraPreview();
     }
@@ -363,22 +404,5 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         camera.release();
     }
 
-    private void setFlashButtonState() {
-        List<String> flashModes = camera.getParameters().getSupportedFlashModes();
-        ImageButton flashModeButton = (ImageButton) getActivity().findViewById(R.id.flash_mode_button);
-        if (null == flashModes || flashModes.size() == 0) {
-            flashModeButton.setVisibility(View.INVISIBLE);
-        } else {
-            flashModeButton.setVisibility(View.VISIBLE);
-            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
-                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_off);
-            }
-            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_ON)) {
-                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_on);
-            }
-            if (camera.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_AUTO)) {
-                flashModeButton.setImageResource(R.drawable.action_bar_glyph_flash_auto);
-            }
-        }
-    }
+
 }
