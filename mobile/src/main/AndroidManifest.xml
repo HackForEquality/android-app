@@ -19,11 +19,13 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".CameraMainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_camera_main">
         </activity>
 
         <activity
             android:name=".CameraMainActivityTest"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_camera_main">
         </activity>
 
@@ -48,6 +50,7 @@
         </activity>
         <activity
             android:name=".SplashScreen"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_splash_screen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -59,6 +62,7 @@
             android:name=".NotificationActivity"
             android:label="@string/title_activity_notification"
             android:parentActivityName=".CameraMainActivityTest"
+            android:screenOrientation="portrait"
             android:theme="@style/AppThemeDarkAction">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
