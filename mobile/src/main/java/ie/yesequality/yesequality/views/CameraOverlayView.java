@@ -5,10 +5,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import ie.yesequality.yesequality.R;
+
 public class CameraOverlayView extends View {
+    TextPaint textPaint = new TextPaint();
+    Rect textRect = new Rect();
 
     public CameraOverlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,6 +44,24 @@ public class CameraOverlayView extends View {
         canvas.drawRect(left, paint);
         canvas.drawRect(right, paint);
         canvas.drawRect(bottom, paint);
-    }
 
+        if (above.height() > 0 && above.width() > 0) {
+            textPaint.setAntiAlias(true);
+            textPaint.setColor(getResources().getColor(R.color.green));
+
+            textPaint.setTextAlign(Paint.Align.CENTER);
+
+            String explanation = getContext().getString(R.string.explanation_message_one_line);
+
+            float scale = (above.width() - 2 * getResources().getDimension(R.dimen.activity_horizontal_margin)) / textPaint.measureText(explanation);
+            textPaint.setTextSize(textPaint.getTextSize() * scale);
+
+
+            textPaint.getTextBounds(explanation, 0, explanation.length(), textRect);
+
+            canvas.drawText(explanation, above.centerX(), above.centerY() + (textRect.height() / 2), textPaint);
+        }
+
+    }
+    
 }

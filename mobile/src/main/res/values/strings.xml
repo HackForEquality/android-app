@@ -57,5 +57,7 @@
     <string name="dontForgetTitle">Don\'t Forget!</string>
     <string name="okButtonNotifications">OK</string>
     <string name="title_activity_camera_main2">CameraMain2Activity</string>
+    <!-- drawText will not draw multiple lines so this message must be only one line -->
+    <string name="explanation_message_one_line">Tap the text to choose other messages.</string>
 
 </resources>
