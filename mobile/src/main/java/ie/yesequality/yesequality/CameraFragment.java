@@ -41,6 +41,25 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
     private CameraOrientationListener orientationListener;
 
+    private static int getDegressFromRotation(int rotation) {
+
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                return 0;
+
+            case Surface.ROTATION_90:
+                return 90;
+
+
+            case Surface.ROTATION_180:
+                return 180;
+
+            case Surface.ROTATION_270:
+            default:
+                return 270;
+        }
+    }
+
     /**
      * On activity getting attached.
      */
@@ -138,26 +157,8 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, cameraInfo);
 
-        int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-        int degrees = 0;
+        int degrees = getDegressFromRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation());
 
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                degrees = 0;
-                break;
-
-            case Surface.ROTATION_90:
-                degrees = 90;
-                break;
-
-            case Surface.ROTATION_180:
-                degrees = 180;
-                break;
-
-            case Surface.ROTATION_270:
-                degrees = 270;
-                break;
-        }
 
         int displayOrientation;
 
@@ -306,17 +307,13 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
 
-        int rotation = (
-                displayOrientation
-                        + orientationListener.getRememberedOrientation()
-                        + layoutOrientation
-        ) % 360;
 
-        if (rotation != 0) {
+        if (displayOrientation != 0) {
             Bitmap oldBitmap = bitmap;
 
             Matrix matrix = new Matrix();
-            matrix.postRotate(rotation);
+            matrix.preScale(1, -1);
+            matrix.postRotate(displayOrientation*3);
 
             bitmap = Bitmap.createBitmap(
                     bitmap,
@@ -334,12 +331,6 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         ivWaterMarkPic = (ImageView) getActivity().findViewById(R.id.ivWaterMarkPic);
 
         Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
-
-        Matrix matrix = new Matrix();
-
-        matrix.postRotate(180);
-
-        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
         bitmap = overlay(bitmap, waterMark);
 
