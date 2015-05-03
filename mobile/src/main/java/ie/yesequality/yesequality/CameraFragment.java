@@ -335,6 +335,12 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
         Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
 
+        Matrix matrix = new Matrix();
+
+        matrix.postRotate(180);
+
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
         bitmap = overlay(bitmap, waterMark);
 
         bitmap = cropBitmapToSquare(bitmap);
@@ -346,11 +352,15 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         Bitmap cropped;
         int h = source.getHeight();
         int w = source.getWidth();
+
         if (w >= h) {
-            cropped = Bitmap.createBitmap(source, w / 2 - h / 2, 0, h, h);
+            int startX = w - h - ((w - h) / 2);
+            cropped = Bitmap.createBitmap(source, startX, 0, h, h);
         } else {
-            cropped = Bitmap.createBitmap(source, 0, h / 2 - w / 2, w, w);
+            int startY = h - w - ((h - w) / 2);
+            cropped = Bitmap.createBitmap(source, 0, startY, w, w);
         }
+
         return cropped;
     }
 
