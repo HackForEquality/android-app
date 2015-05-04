@@ -10,8 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -32,8 +34,8 @@ import ie.yesequality.yesequality.views.CameraFragmentListener;
 public class CameraMainActivityTest extends AppCompatActivity implements CameraFragmentListener {
     public static final String TAG = "CameraMainActivity";
     private static final int PICTURE_QUALITY = 100;
-    //@InjectView(R.id.tbActionBar)
-    //protected Toolbar tbActionBar;
+    @InjectView(R.id.tbActionBar)
+    protected Toolbar tbActionBar;
     @InjectView(R.id.rlSurfaceLayout)
     protected RelativeLayout rlSurfaceLayout;
     @InjectView(R.id.ivWaterMarkPic)
@@ -83,28 +85,28 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         setContentView(R.layout.surface_camera_layout_test);
         ButterKnife.inject(this);
 
-//        tbActionBar.setTitle(R.string.app_name);
-//        tbActionBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.action_info:
-//                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity.class);
-//                        startActivity(infoIntent);
-//                        return true;
-//                    case R.id.action_reminders:
-//                        Intent reminderIntent = new Intent(CameraMainActivityTest.this, NotificationActivity.class);
-//                        startActivity(reminderIntent);
-//                        return true;
-//
-//                    default:
-//                        return false;
-//
-//                }
-//            }
-//        });
-//
-//        tbActionBar.inflateMenu(R.menu.menu_camera_main);
+        tbActionBar.setTitle(R.string.app_name);
+        tbActionBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_info:
+                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity.class);
+                        startActivity(infoIntent);
+                        return true;
+                    case R.id.action_reminders:
+                        Intent reminderIntent = new Intent(CameraMainActivityTest.this, NotificationActivity.class);
+                        startActivity(reminderIntent);
+                        return true;
+
+                    default:
+                        return false;
+
+                }
+            }
+        });
+
+        tbActionBar.inflateMenu(R.menu.menu_camera_main);
 
         ivWaterMarkPic.setOnDragListener(new BadgeDragListener());
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
@@ -30,16 +31,14 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 640;
-
+    TextureView previewView;
     private int cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera camera;
     private SurfaceHolder surfaceHolder;
     private CameraFragmentListener listener;
     private int displayOrientation;
     private int layoutOrientation;
-
     private ImageView ivWaterMarkPic;
-
     private CameraOrientationListener orientationListener;
     private int actionBarSize;
 
@@ -85,7 +84,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        TextureView previewView = new TextureView(getActivity());
+        previewView = new TextureView(getActivity());
 
         previewView.setSurfaceTextureListener(this);
 
@@ -101,6 +100,9 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         orientationListener.enable();
 
+        if (previewView.getSurfaceTexture() != null && camera != null) {
+            camera.startPreview();
+        }
 //        try {
 //            startCamera();
 //        } catch (Exception exception) {
@@ -346,64 +348,24 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
     private Bitmap cropBitmapToSquare(Bitmap source) {
-        Bitmap cropped;
         int h = source.getHeight();
         int w = source.getWidth();
+        int sq = Math.min(h, w);
+        int l = (w - sq) / 2;
+        int t = (h - sq) / 2;
+        int r = l + sq;
+        int b = t + sq;
+        Rect innerRect = new Rect(l, t, r, b);
 
-        if (w >= h) {
-            int startX = w - h - ((w - h) / 2);
-            source = Bitmap.createBitmap(source, startX, 0, h, h);
-        } else {
-            int startY = h - w - ((h - w) / 2);
-            source = Bitmap.createBitmap(source, 0, startY, w, w);
-        }
+
+        source = Bitmap.createBitmap(source, innerRect.left, innerRect.top, innerRect.width(), innerRect.height());
 
         return source;
     }
 
-//    /**
-//     * On camera preview surface created.
-//     *
-//     * @param holder
-//     */
-//    @Override
-//    public void surfaceCreated(SurfaceHolder holder) {
-//        this.surfaceHolder = holder;
-//
-//        startCameraPreview();
-//    }
-//
-//    /**
-//     * On camera preview surface changed.
-//     */
-//    @Override
-//    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-//        // The interface forces us to have this method but we don't need it
-//        // up to now.
-//    }
-//
-//    /**
-//     * On camera preview surface getting destroyed.
-//     */
-//    @Override
-//    public void surfaceDestroyed(SurfaceHolder holder) {
-////        if (camera != null) {
-////            camera.stopPreview();
-////            camera.release();
-////        }
-////
-////        camera =  null;
-//    }
-
 
     private void startCamera() {
-        if (camera != null) {
-            stopCamera();
-        }
 
-
-        camera = Camera.open(cameraId);
-        startCameraPreview();
     }
 
     private void stopCamera() {

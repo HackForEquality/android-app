@@ -30,14 +30,11 @@
     </RelativeLayout>
 
 
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/tbActionBar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--foreground="?android:windowContentOverlay"-->
-    <!--android:layout_height="?android:attr/actionBarSize"-->
-    <!--android:background="?attr/colorPrimary"-->
-
-    <!--/>-->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tbActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="?attr/colorPrimary" />
 
     <ImageView
         android:id="@+id/selfieButton"
