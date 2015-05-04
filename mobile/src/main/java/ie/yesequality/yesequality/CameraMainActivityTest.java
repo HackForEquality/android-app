@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -13,10 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -31,6 +34,7 @@ import java.util.Locale;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import ie.yesequality.yesequality.views.CameraFragmentListener;
+import ie.yesequality.yesequality.views.CameraOverlayView;
 
 public class CameraMainActivityTest extends AppCompatActivity implements CameraFragmentListener {
     public static final String TAG = "CameraMainActivity";
@@ -43,6 +47,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
     protected ImageView ivWaterMarkPic;
     @InjectView(R.id.selfieButton)
     protected ImageView selfieButton;
+    @InjectView(R.id.camera_overlay)
+    protected CameraOverlayView cameraOverlayView;
     private boolean isFinishedPhotoCapture = false;
 
 
@@ -109,34 +115,29 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
         tbActionBar.inflateMenu(R.menu.menu_camera_main);
 
-        ivWaterMarkPic.setOnDragListener(new BadgeDragListener());
+        final BadgeDragListener badgeDragListener = new BadgeDragListener();
+        ivWaterMarkPic.setOnDragListener(badgeDragListener);
 
 
         ivWaterMarkPic.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
+
                     case MotionEvent.ACTION_MOVE: {
+
                         ClipData data = ClipData.newPlainText("", "");
                         View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                         v.startDrag(data, shadowBuilder, v, 0);
                         v.setVisibility(View.INVISIBLE);
                         return true;
+
                     }
                 }
                 return false;
             }
         });
-//        ivWaterMarkPic.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                ClipData data = ClipData.newPlainText("", "");
-//                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-//                v.startDrag(data, shadowBuilder, v, 0);
-//                v.setVisibility(View.INVISIBLE);
-//                return true;
-//            }
-//        });
 
 
         ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
@@ -150,11 +151,21 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                 }
 
                 ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
+                ivWaterMarkPic.setVisibility(View.VISIBLE);
             }
         });
 
 
         rlSurfaceLayout.setOnDragListener(new BadgeDragListener());
+        cameraOverlayView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Rect overlayInnerRect = cameraOverlayView.getInnerRect();
+                rlSurfaceLayout.setLayoutParams(new FrameLayout.LayoutParams(overlayInnerRect.width(), overlayInnerRect.height(), Gravity.CENTER));
+
+                cameraOverlayView.removeOnLayoutChangeListener(this);
+            }
+        });
     }
 
 
@@ -277,15 +288,30 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
 
     private final class BadgeDragListener implements View.OnDragListener {
+        float internalX = 0, internalY = 0;
+
         @Override
         public boolean onDrag(View v, DragEvent event) {
             int action = event.getAction();
             switch (action) {
+                case DragEvent.ACTION_DRAG_LOCATION:
+                    internalX = event.getX();
+                    internalY = event.getY();
+                    break;
+
                 case DragEvent.ACTION_DROP:
+
+
                     View view = (View) event.getLocalState();
                     view.setX(event.getX() - (view.getWidth() / 2));
                     view.setY(event.getY() - (view.getHeight() / 2));
                     view.setVisibility(View.VISIBLE);
+                    break;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    View eventView = ((View) event.getLocalState());
+                    eventView.setX(internalX - (eventView.getWidth() / 2));
+                    eventView.setY(internalY - (eventView.getHeight() / 2));
+                    eventView.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
