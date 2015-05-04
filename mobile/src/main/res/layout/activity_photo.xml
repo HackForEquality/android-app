@@ -17,6 +17,7 @@
             android:layout_height="match_parent"
             tools:src="@mipmap/ic_launcher"/>
 
+
         <ImageView
             android:id="@+id/ivWaterMarkPic"
             android:layout_width="150dp"

@@ -1,58 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center_horizontal"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
+    <fragment
+        android:id="@+id/camera_fragment"
+        android:name="ie.yesequality.yesequality.CameraFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ie.yesequality.yesequality.views.CameraOverlayView
+        android:id="@+id/camera_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top" />
+
+    <RelativeLayout
+        android:id="@+id/rlSurfaceLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/rlSurfaceLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <fragment
-                android:id="@+id/camera_fragment"
-                android:name="ie.yesequality.yesequality.CameraFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-
-            <ie.yesequality.yesequality.views.CameraOverlayView
-                android:id="@+id/camera_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="top"/>
-
-            <ImageView
-                android:id="@+id/ivWaterMarkPic"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_alignBottom="@+id/camera_fragment"
-                android:layout_marginBottom="100dp"
-                android:layout_marginLeft="20dp"
-                android:src="@drawable/ic_vote_for_me"
-                android:visibility="visible"/>
-
-        </RelativeLayout>
-
-
         <ImageView
-            android:id="@+id/selfieButton"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_gravity="bottom|center"
-            android:layout_margin="16dp"
-            android:onClick="takePicture"
-            android:src="@drawable/ic_selfie"/>
+            android:id="@+id/ivWaterMarkPic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_vote_for_me"
+            android:visibility="visible" />
+    </RelativeLayout>
 
 
+    <!--<android.support.v7.widget.Toolbar-->
+    <!--android:id="@+id/tbActionBar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--foreground="?android:windowContentOverlay"-->
+    <!--android:layout_height="?android:attr/actionBarSize"-->
+    <!--android:background="?attr/colorPrimary"-->
+
+    <!--/>-->
+
+    <ImageView
+        android:id="@+id/selfieButton"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="16dp"
+        android:onClick="takePicture"
+        android:src="@drawable/ic_selfie" />
+
+</FrameLayout>
 
 
-    </FrameLayout>
-
-
-</LinearLayout>

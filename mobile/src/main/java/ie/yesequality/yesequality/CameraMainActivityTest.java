@@ -6,14 +6,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -29,9 +29,11 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import ie.yesequality.yesequality.views.CameraFragmentListener;
 
-public class CameraMainActivityTest extends ActionBarActivity implements CameraFragmentListener {
+public class CameraMainActivityTest extends AppCompatActivity implements CameraFragmentListener {
     public static final String TAG = "CameraMainActivity";
     private static final int PICTURE_QUALITY = 100;
+    //@InjectView(R.id.tbActionBar)
+    //protected Toolbar tbActionBar;
     @InjectView(R.id.rlSurfaceLayout)
     protected RelativeLayout rlSurfaceLayout;
     @InjectView(R.id.ivWaterMarkPic)
@@ -67,9 +69,42 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // If the Android version is lower than Jellybean, use this call to hide
+        // the status bar.
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            View decorView = getWindow().getDecorView();
+            // Hide the status bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
         setContentView(R.layout.surface_camera_layout_test);
         ButterKnife.inject(this);
+
+//        tbActionBar.setTitle(R.string.app_name);
+//        tbActionBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.action_info:
+//                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity.class);
+//                        startActivity(infoIntent);
+//                        return true;
+//                    case R.id.action_reminders:
+//                        Intent reminderIntent = new Intent(CameraMainActivityTest.this, NotificationActivity.class);
+//                        startActivity(reminderIntent);
+//                        return true;
+//
+//                    default:
+//                        return false;
+//
+//                }
+//            }
+//        });
+//
+//        tbActionBar.inflateMenu(R.menu.menu_camera_main);
 
         ivWaterMarkPic.setOnDragListener(new BadgeDragListener());
 
@@ -103,35 +138,6 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
         rlSurfaceLayout.setOnDragListener(new BadgeDragListener());
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_camera_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_info:
-                Intent infoIntent = new Intent(this, MainActivity.class);
-                startActivity(infoIntent);
-                return true;
-            case R.id.action_reminders:
-                Intent reminderIntent = new Intent(this, NotificationActivity.class);
-                startActivity(reminderIntent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
-
-
-    }
 
     @Override
     protected void onResume() {
@@ -196,8 +202,6 @@ public class CameraMainActivityTest extends ActionBarActivity implements CameraF
 
         fragment.takePicture();
     }
-
-
 
 
     /**

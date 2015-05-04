@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,9 +24,8 @@ import java.util.List;
 
 import ie.yesequality.yesequality.views.CameraFragmentListener;
 import ie.yesequality.yesequality.views.CameraOrientationListener;
-import ie.yesequality.yesequality.views.CameraPreview;
 
-public class CameraFragment extends Fragment implements SurfaceHolder.Callback, Camera.PictureCallback {
+public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener, Camera.PictureCallback {
     public static final String TAG = "CameraFragment";
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
@@ -40,8 +41,9 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     private ImageView ivWaterMarkPic;
 
     private CameraOrientationListener orientationListener;
+    private int actionBarSize;
 
-    private static int getDegressFromRotation(int rotation) {
+    private static int getDegreesFromRotation(int rotation) {
 
         switch (rotation) {
             case Surface.ROTATION_0:
@@ -83,9 +85,9 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        CameraPreview previewView = new CameraPreview(getActivity());
+        TextureView previewView = new TextureView(getActivity());
 
-        previewView.getHolder().addCallback(this);
+        previewView.setSurfaceTextureListener(this);
 
         return previewView;
     }
@@ -99,27 +101,27 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
         orientationListener.enable();
 
-        try {
-            startCamera();
-        } catch (Exception exception) {
-            Log.e(TAG, "Can't open camera with id " + cameraId, exception);
-
-            listener.onCameraError();
-            return;
-        }
+//        try {
+//            startCamera();
+//        } catch (Exception exception) {
+//            Log.e(TAG, "Can't open camera with id " + cameraId, exception);
+//
+//            listener.onCameraError();
+//            return;
+//        }
     }
 
     /**
      * On fragment getting paused.
      */
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        orientationListener.disable();
-
-        stopCamera();
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//
+//        orientationListener.disable();
+//
+//        stopCamera();
+//    }
 
     /**
      * Start the camera preview.
@@ -157,7 +159,7 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, cameraInfo);
 
-        int degrees = getDegressFromRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation());
+        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation());
 
 
         int displayOrientation;
@@ -171,6 +173,16 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
         this.displayOrientation = displayOrientation;
         this.layoutOrientation = degrees;
+        // Calculate ActionBar height
+//        TypedValue tv = new TypedValue();
+//        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+//            this.actionBarSize = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+//        } else {
+//            this.actionBarSize = (int) getResources().getDimension(R.dimen.abc_action_bar_default_height_material);
+//        }
+
+        //this.actionBarSize = ((CameraMainActivityTest)getActivity()).tbActionBar.getHeight();
+
 
         camera.setDisplayOrientation(displayOrientation);
     }
@@ -307,26 +319,20 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
 
+        Matrix matrix = new Matrix();
+        matrix.preScale(1, -1);
+        matrix.postRotate(270);
 
-        if (displayOrientation != 0) {
-            Bitmap oldBitmap = bitmap;
+        bitmap = Bitmap.createBitmap(
+                bitmap,
+                0,
+                0,
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                matrix,
+                false
+        );
 
-            Matrix matrix = new Matrix();
-            matrix.preScale(1, -1);
-            matrix.postRotate(displayOrientation*3);
-
-            bitmap = Bitmap.createBitmap(
-                    bitmap,
-                    0,
-                    0,
-                    bitmap.getWidth(),
-                    bitmap.getHeight(),
-                    matrix,
-                    false
-            );
-
-            oldBitmap.recycle();
-        }
 
         ivWaterMarkPic = (ImageView) getActivity().findViewById(R.id.ivWaterMarkPic);
 
@@ -346,48 +352,48 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
 
         if (w >= h) {
             int startX = w - h - ((w - h) / 2);
-            cropped = Bitmap.createBitmap(source, startX, 0, h, h);
+            source = Bitmap.createBitmap(source, startX, 0, h, h);
         } else {
             int startY = h - w - ((h - w) / 2);
-            cropped = Bitmap.createBitmap(source, 0, startY, w, w);
+            source = Bitmap.createBitmap(source, 0, startY, w, w);
         }
 
-        return cropped;
+        return source;
     }
 
-    /**
-     * On camera preview surface created.
-     *
-     * @param holder
-     */
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        this.surfaceHolder = holder;
-
-        startCameraPreview();
-    }
-
-    /**
-     * On camera preview surface changed.
-     */
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        // The interface forces us to have this method but we don't need it
-        // up to now.
-    }
-
-    /**
-     * On camera preview surface getting destroyed.
-     */
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-//        if (camera != null) {
-//            camera.stopPreview();
-//            camera.release();
-//        }
+//    /**
+//     * On camera preview surface created.
+//     *
+//     * @param holder
+//     */
+//    @Override
+//    public void surfaceCreated(SurfaceHolder holder) {
+//        this.surfaceHolder = holder;
 //
-//        camera =  null;
-    }
+//        startCameraPreview();
+//    }
+//
+//    /**
+//     * On camera preview surface changed.
+//     */
+//    @Override
+//    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+//        // The interface forces us to have this method but we don't need it
+//        // up to now.
+//    }
+//
+//    /**
+//     * On camera preview surface getting destroyed.
+//     */
+//    @Override
+//    public void surfaceDestroyed(SurfaceHolder holder) {
+////        if (camera != null) {
+////            camera.stopPreview();
+////            camera.release();
+////        }
+////
+////        camera =  null;
+//    }
 
 
     private void startCamera() {
@@ -406,4 +412,85 @@ public class CameraFragment extends Fragment implements SurfaceHolder.Callback, 
     }
 
 
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+
+        camera.setDisplayOrientation(90);
+
+        // stop preview before making changes
+        try {
+            camera.stopPreview();
+        } catch (Exception e) {
+            // ignore: tried to stop a non-existent preview
+        }
+
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+        Camera.Parameters params = camera.getParameters();
+        params.set("orientation", "portrait");
+        Camera.Size optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(), getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+        params.setPreviewSize(optimalSize.width, optimalSize.height);
+        camera.setParameters(params);
+        // start preview with new settings
+        try {
+            camera.setPreviewTexture(surface);
+            camera.startPreview();
+
+        } catch (Exception e) {
+            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+// Ignored, Camera does all the work for us
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        camera.stopPreview();
+        camera.release();
+        return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+// Invoked every time there's a new Camera preview frame
+    }
+
+
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.05;
+        double targetRatio = (double) w / h;
+
+        if (sizes == null) return null;
+
+        Camera.Size optimalSize = null;
+
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        // Find size
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
 }

@@ -2,7 +2,6 @@ package ie.yesequality.yesequality.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
@@ -39,7 +38,7 @@ public class CameraOverlayView extends View {
 
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.WHITE);
+        paint.setColor(getResources().getColor(R.color.transparent_white));
         canvas.drawRect(above, paint);
         canvas.drawRect(left, paint);
         canvas.drawRect(right, paint);
@@ -63,5 +62,5 @@ public class CameraOverlayView extends View {
         }
 
     }
-    
+
 }
