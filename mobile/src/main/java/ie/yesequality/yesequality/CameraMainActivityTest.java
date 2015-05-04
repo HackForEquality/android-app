@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -110,16 +111,32 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
         ivWaterMarkPic.setOnDragListener(new BadgeDragListener());
 
-        ivWaterMarkPic.setOnLongClickListener(new View.OnLongClickListener() {
+
+        ivWaterMarkPic.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onLongClick(View v) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                v.startDrag(data, shadowBuilder, v, 0);
-                v.setVisibility(View.INVISIBLE);
-                return true;
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE: {
+                        ClipData data = ClipData.newPlainText("", "");
+                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                        v.startDrag(data, shadowBuilder, v, 0);
+                        v.setVisibility(View.INVISIBLE);
+                        return true;
+                    }
+                }
+                return false;
             }
         });
+//        ivWaterMarkPic.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                ClipData data = ClipData.newPlainText("", "");
+//                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+//                v.startDrag(data, shadowBuilder, v, 0);
+//                v.setVisibility(View.INVISIBLE);
+//                return true;
+//            }
+//        });
 
 
         ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
