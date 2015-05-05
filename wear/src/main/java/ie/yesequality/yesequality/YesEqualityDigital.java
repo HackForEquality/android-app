@@ -21,7 +21,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -42,14 +47,13 @@ import java.util.concurrent.TimeUnit;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class YesEqualityDigital extends CanvasWatchFaceService {
-    private static final Typeface NORMAL_TYPEFACE =
-            Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
      * displayed in interactive mode.
      */
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+
 
     @Override
     public Engine onCreateEngine() {
@@ -58,7 +62,7 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
 
     private class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
-
+        private static final float STROKE_WIDTH = 3f;
         /**
          * Handler to update the time periodically in interactive mode.
          */
@@ -79,8 +83,6 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
             }
         };
         boolean mRegisteredTimeZoneReceiver = false;
-        Paint mBackgroundPaint;
-        Paint mTextPaint;
         boolean mAmbient;
         Time mTime;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -92,12 +94,22 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
         };
         float mXOffset;
         float mYOffset;
-
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
+        private Paint mBackgroundPaint;
+        private Paint mTextPaint;
+        private Paint mSmallTextPaint;
+        private Bitmap mGrayBackgroundBitmap;
+        private Bitmap mBackgroundBitmap;
+        private int mWidth;
+        private int mHeight;
+        private Paint mSecondUnderlayPaint;
+        private Paint mSecondPaint;
+        private boolean mBurnInProtection;
+
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -107,17 +119,32 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
+                    .setViewProtection(WatchFaceStyle.PROTECT_HOTWORD_INDICATOR)
                     .build());
             Resources resources = YesEqualityDigital.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
+            mBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                    .background_digital);
 
             mTextPaint = new Paint();
-            mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTextPaint = createTextPaint(Color.WHITE);
+            mSmallTextPaint = new Paint(mTextPaint);
+
+            mSecondUnderlayPaint = new Paint();
+            mSecondUnderlayPaint.setColor(getResources().getColor(R.color.second_shadow));
+            mSecondUnderlayPaint.setStrokeWidth(STROKE_WIDTH);
+            mSecondUnderlayPaint.setAntiAlias(true);
+            //mSecondUnderlayPaint.setStrokeCap(Paint.Cap.ROUND);
+            mSecondUnderlayPaint.setStyle(Paint.Style.STROKE);
+            mSecondPaint = new Paint(mSecondUnderlayPaint);
+            mSecondPaint.setColor(Color.WHITE);
 
             mTime = new Time();
+
+
         }
 
         @Override
@@ -129,8 +156,8 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
         private Paint createTextPaint(int textColor) {
             Paint paint = new Paint();
             paint.setColor(textColor);
-            paint.setTypeface(NORMAL_TYPEFACE);
             paint.setAntiAlias(true);
+            paint.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/ag_book_stencil.ttf"));
             return paint;
         }
 
@@ -183,12 +210,14 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
             mTextPaint.setTextSize(textSize);
+            mSmallTextPaint.setTextSize(textSize / 3);
         }
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
             super.onPropertiesChanged(properties);
             mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
+            mBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
         }
 
         @Override
@@ -204,6 +233,7 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mTextPaint.setAntiAlias(!inAmbientMode);
+                    mSmallTextPaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -216,14 +246,38 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             // Draw the background.
-            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
-            // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
+            if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
+                canvas.drawColor(Color.BLACK);
+            } else if (mAmbient) {
+                canvas.drawBitmap(mGrayBackgroundBitmap, 0, 0, mBackgroundPaint);
+            } else {
+                canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
+            }
             mTime.setToNow();
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+            String text = String.format("%d:%02d", mTime.hour, mTime.minute);
+
+            //Measure our text
+            Rect textRect = new Rect();
+            mTextPaint.getTextBounds(text, 0, text.length(), textRect);
+            float textWidth = mTextPaint.measureText(text);
+            float timeStartX = (mWidth - textWidth) / 2f;
+            float timeStartY = mHeight / 3f;
+
+            canvas.drawText(text, timeStartX, timeStartY, mTextPaint);
+
+            if (!mAmbient) {
+                canvas.drawLine(timeStartX, timeStartY + (2 * STROKE_WIDTH), timeStartX +
+                        textWidth, timeStartY + (2 * STROKE_WIDTH), mSecondUnderlayPaint);
+
+                float secondWidth = mTime.second * (textWidth / 59f);
+                canvas.drawLine(timeStartX, timeStartY + (2 * STROKE_WIDTH), timeStartX +
+                        secondWidth, timeStartY + (2 * STROKE_WIDTH), mSecondPaint);
+            }
+
+            String brandText = "YES EQUALITY.";
+            mSmallTextPaint.getTextBounds(brandText, 0, brandText.length(), textRect);
+            canvas.drawText(brandText, (mWidth - mSmallTextPaint.measureText(brandText)) / 2f,
+                    timeStartY + (4 * STROKE_WIDTH) + textRect.height(), mSmallTextPaint);
         }
 
         /**
@@ -237,12 +291,44 @@ public class YesEqualityDigital extends CanvasWatchFaceService {
             }
         }
 
+
+        @Override
+        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            super.onSurfaceChanged(holder, format, width, height);
+            mWidth = width;
+            mHeight = height;
+
+            float widthScale = ((float) width) / (float) mBackgroundBitmap.getWidth();
+
+
+            float scaledWidth = (mBackgroundBitmap.getWidth() * widthScale);
+
+            mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
+                    (int) (scaledWidth),
+                    (int) (scaledWidth), true);
+
+            initGrayBackgroundBitmap();
+        }
+
         /**
          * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
          * only run when we're visible and in interactive mode.
          */
         private boolean shouldTimerBeRunning() {
             return isVisible() && !isInAmbientMode();
+        }
+
+        private void initGrayBackgroundBitmap() {
+            mGrayBackgroundBitmap = Bitmap.createBitmap(mBackgroundBitmap.getWidth(),
+                    mBackgroundBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(mGrayBackgroundBitmap);
+            Paint grayPaint = new Paint();
+            ColorMatrix colorMatrix = new ColorMatrix();
+            colorMatrix.setSaturation(0);
+            ColorMatrixColorFilter filter = new
+                    ColorMatrixColorFilter(colorMatrix);
+            grayPaint.setColorFilter(filter);
+            canvas.drawBitmap(mBackgroundBitmap, 0, 0, grayPaint);
         }
     }
 }
