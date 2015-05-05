@@ -19,6 +19,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private ImageView ivWaterMarkPic;
     private CameraOrientationListener orientationListener;
     private int actionBarSize;
+    private RelativeLayout rlSurfaceLayout;
 
     private static int getDegreesFromRotation(int rotation) {
 
@@ -265,48 +267,22 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
 
-    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float left, float top, int parentWidth, int parentHeight) {
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
 
-        // The badge is 150dp x 150dp
-        Log.e("CameraActivity", "bmp2 height is: " + bmp2.getHeight());
-        Log.e("CameraActivity", "bmp2 width is: " + bmp2.getWidth());
-        // A lot of magic numbers in here; trial an error mostly.
-        // There are two sizes of badges (changing in height)
-        // These should be calculated automatically instead of hardcoding them here
-        // 320 x 275 ---> 150 x 129
-        // 320 x 121 ---> 150 x 57
-        int widthScale = 300;
-        int heightScale = 129;
-        if (bmp2.getHeight() != 275) {
-            heightScale = 57;
-        }
+        float overlayLeft = (left / parentWidth) * bmp1.getWidth();
+        float overlayTop = (top / parentHeight) * bmp1.getHeight();
 
-        // mirror the camera snapshot to match the camera preview
-        Matrix matrixBmp1 = new Matrix();
-        matrixBmp1.setScale(-1, 1);
-        matrixBmp1.postTranslate(bmp1.getWidth(), 0);
+        float horizontalScale = ((float) bmp2.getWidth() / parentWidth) * bmp1.getWidth();
+        float verticalScale = ((float) bmp2.getHeight() / parentHeight) * bmp1.getHeight();
 
-        // set the badge position and dimension, to match the one from the camera preview
-        Matrix matrixBmp2 = new Matrix();
-//        if (heightScale == 57) { // I have no idea why this correction is needed for smaller badges
-//            Log.e("CameraActivity", "I am correcting the height cause bmp2 height is: " + bmp2.getHeight());
-//            Log.e("CameraActivity", "old bottomsize is: " + bottomPanelSize);
-//            bottomPanelSize -= 26;
-//            Log.e("CameraActivity", "new bottomsize is: " + bottomPanelSize);
-//        }
-        // Badge has to be scaled or will be grabbed as is form resources.
-        // preserve badge aspect ratio
-        float badgeScaleIdx = bmp2.getWidth() / bmp2.getHeight();
+        bmp2 = Bitmap.createScaledBitmap(bmp2, (int) (horizontalScale), (int) (verticalScale), false);
 
-        // more magic here. It "works", so leaving like that for now. Too tired for a proper solution
-        matrixBmp2.postTranslate(ivWaterMarkPic.getX(), ivWaterMarkPic.getY() - (Math.round(widthScale * badgeScaleIdx) / 2));
+        canvas.drawBitmap(bmp1, 0, 0, null);
 
-        Bitmap scaledBadge = Bitmap.createScaledBitmap(bmp2, widthScale, Math.round(widthScale * badgeScaleIdx), true);
+        canvas.drawBitmap(bmp2, overlayLeft, overlayTop, null);
 
-        canvas.drawBitmap(bmp1, new Matrix(), null);
-        canvas.drawBitmap(scaledBadge, matrixBmp2, null);
 
         return bmOverlay;
     }
@@ -337,12 +313,15 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
 
         ivWaterMarkPic = (ImageView) getActivity().findViewById(R.id.ivWaterMarkPic);
+        rlSurfaceLayout = (RelativeLayout) getActivity().findViewById(R.id.rlSurfaceLayout);
+
 
         Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
 
-        bitmap = overlay(bitmap, waterMark);
-
         bitmap = cropBitmapToSquare(bitmap);
+
+        bitmap = overlay(bitmap, waterMark, ivWaterMarkPic.getX(), ivWaterMarkPic.getY(), rlSurfaceLayout.getWidth(), rlSurfaceLayout.getHeight());
+
 
         listener.onPictureTaken(bitmap);
     }

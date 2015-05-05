@@ -49,7 +49,6 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
     protected ImageView selfieButton;
     @InjectView(R.id.camera_overlay)
     protected CameraOverlayView cameraOverlayView;
-    private boolean isFinishedPhotoCapture = false;
 
 
     private int[] mVoteBadges = new int[]{R.drawable.ic_vote_for_me,
@@ -175,35 +174,6 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         selfieButton.setEnabled(true);
     }
 
-    //    private void shareIt() {
-//
-//        String fname = getPhotoDirectory(this) + "/yesequal.jpg";
-//
-//        Bitmap myfile = BitmapFactory.decodeFile(fname);
-//
-//        Intent share = new Intent(Intent.ACTION_SEND);
-//        share.setType("image/jpeg");
-//
-//        ContentValues values = new ContentValues();
-//        values.put(MediaStore.Images.Media.TITLE, "title");
-//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-//        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                values);
-//
-//
-//        OutputStream outstream;
-//        try {
-//            outstream = getContentResolver().openOutputStream(uri);
-//            myfile.compress(Bitmap.CompressFormat.JPEG, 100, outstream);
-//            outstream.close();
-//        } catch (Exception e) {
-//            System.err.println(e.toString());
-//
-//        }
-//
-//        share.putExtra(Intent.EXTRA_STREAM, uri);
-//        startActivity(Intent.createChooser(share, "Share Image"));
-//    }
 
     /**
      * On fragment notifying about a non-recoverable problem with the camera.
@@ -300,13 +270,12 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                     break;
 
                 case DragEvent.ACTION_DROP:
-
-
                     View view = (View) event.getLocalState();
                     view.setX(event.getX() - (view.getWidth() / 2));
                     view.setY(event.getY() - (view.getHeight() / 2));
                     view.setVisibility(View.VISIBLE);
                     break;
+
                 case DragEvent.ACTION_DRAG_ENDED:
                     View eventView = ((View) event.getLocalState());
                     eventView.setX(internalX - (eventView.getWidth() / 2));
