@@ -69,11 +69,6 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         return context.getExternalFilesDir(null).getPath();
     }
 
-    /**
-     * On activity getting created.
-     *
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,20 +114,29 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
 
         ivWaterMarkPic.setOnTouchListener(new View.OnTouchListener() {
+            float downX = 0, downY = 0;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downX = event.getX();
+                        downY = event.getY();
+                        break;
 
-                    case MotionEvent.ACTION_MOVE: {
+                    case MotionEvent.ACTION_MOVE:
+                        // This filters out smaller motions to try and stop the badge from
+                        // shifting around while the user is trying to click on it.
+                        if (Math.abs(downX - event.getX()) + Math.abs(downY - event.getY()) > 16 * getResources().getDisplayMetrics().density) {
+                            ClipData data = ClipData.newPlainText("", "");
+                            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                            v.startDrag(data, shadowBuilder, v, 0);
+                            v.setVisibility(View.INVISIBLE);
+                            return true;
+                        }
 
-                        ClipData data = ClipData.newPlainText("", "");
-                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                        v.startDrag(data, shadowBuilder, v, 0);
-                        v.setVisibility(View.INVISIBLE);
-                        return true;
-
-                    }
+                    default:
+                        return false;
                 }
                 return false;
             }
