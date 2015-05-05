@@ -262,6 +262,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
 
     private final class BadgeDragListener implements View.OnDragListener {
+
         float internalX = 0, internalY = 0;
 
         @Override
@@ -271,6 +272,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                 case DragEvent.ACTION_DRAG_LOCATION:
                     internalX = event.getX();
                     internalY = event.getY();
+
                     break;
 
                 case DragEvent.ACTION_DROP:
@@ -282,8 +284,24 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
                 case DragEvent.ACTION_DRAG_ENDED:
                     View eventView = ((View) event.getLocalState());
-                    eventView.setX(internalX - (eventView.getWidth() / 2));
-                    eventView.setY(internalY - (eventView.getHeight() / 2));
+
+                    if (internalX < eventView.getWidth() / 2) {
+                        eventView.setX(0);
+                    } else if (rlSurfaceLayout.getWidth() - internalX < eventView.getWidth() / 2) {
+                        eventView.setX(rlSurfaceLayout.getWidth() - eventView.getWidth());
+                    } else {
+                        eventView.setX(internalX - (eventView.getWidth() / 2));
+                    }
+
+
+                    if (internalY < eventView.getHeight() / 2) {
+                        eventView.setY(0);
+                    } else if (rlSurfaceLayout.getHeight() - internalY < eventView.getHeight() / 2) {
+                        eventView.setY(rlSurfaceLayout.getHeight() - eventView.getHeight());
+                    } else {
+                        eventView.setY(internalY - (eventView.getHeight() / 2));
+                    }
+
                     eventView.setVisibility(View.VISIBLE);
                     break;
                 default:
