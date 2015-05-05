@@ -59,5 +59,6 @@
     <string name="title_activity_camera_main2">CameraMain2Activity</string>
     <!-- drawText will not draw multiple lines so this message must be only one line -->
     <string name="explanation_message_one_line">Tap the text to choose other messages.</string>
+    <string name="error_unable_to_connect">Unable to connect to the camera :(</string>
 
 </resources>

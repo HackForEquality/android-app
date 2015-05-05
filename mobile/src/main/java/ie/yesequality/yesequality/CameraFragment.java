@@ -34,7 +34,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private static final int PREVIEW_SIZE_MAX_WIDTH = 640;
     TextureView previewView;
     private int cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
-    private Camera camera;
+    private Camera mCamera;
     private SurfaceHolder surfaceHolder;
     private CameraFragmentListener listener;
     private int displayOrientation;
@@ -102,13 +102,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         orientationListener.enable();
 
-        if (previewView.getSurfaceTexture() != null && camera != null) {
-            camera.startPreview();
+        if (previewView.getSurfaceTexture() != null && mCamera != null) {
+            mCamera.startPreview();
         }
 //        try {
 //            startCamera();
 //        } catch (Exception exception) {
-//            Log.e(TAG, "Can't open camera with id " + cameraId, exception);
+//            Log.e(TAG, "Can't open mCamera with id " + cameraId, exception);
 //
 //            listener.onCameraError();
 //            return;
@@ -128,35 +128,35 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //    }
 
     /**
-     * Start the camera preview.
+     * Start the mCamera preview.
      */
     private synchronized void startCameraPreview() {
         determineDisplayOrientation();
         setupCamera();
 
         try {
-            camera.setPreviewDisplay(surfaceHolder);
-            camera.startPreview();
+            mCamera.setPreviewDisplay(surfaceHolder);
+            mCamera.startPreview();
         } catch (Exception exception) {
-            Log.e(TAG, "Can't start camera preview due to Exception", exception);
+            Log.e(TAG, "Can't start mCamera preview due to Exception", exception);
 
             listener.onCameraError();
         }
     }
 
     /**
-     * Stop the camera preview.
+     * Stop the mCamera preview.
      */
     private synchronized void stopCameraPreview() {
         try {
-            camera.stopPreview();
+            mCamera.stopPreview();
         } catch (Exception exception) {
-            Log.i(TAG, "Exception during stopping camera preview");
+            Log.i(TAG, "Exception during stopping mCamera preview");
         }
     }
 
     /**
-     * Determine the current display orientation and rotate the camera preview
+     * Determine the current display orientation and rotate the mCamera preview
      * accordingly.
      */
     public void determineDisplayOrientation() {
@@ -188,14 +188,14 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         //this.actionBarSize = ((CameraMainActivityTest)getActivity()).tbActionBar.getHeight();
 
 
-        camera.setDisplayOrientation(displayOrientation);
+        mCamera.setDisplayOrientation(displayOrientation);
     }
 
     /**
-     * Setup the camera parameters.
+     * Setup the mCamera parameters.
      */
     public void setupCamera() {
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = mCamera.getParameters();
 
         Camera.Size bestPreviewSize = determineBestPreviewSize(parameters);
         Camera.Size bestPictureSize = determineBestPictureSize(parameters);
@@ -204,20 +204,20 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         parameters.setPictureSize(bestPictureSize.width, bestPictureSize.height);
 
         try {
-            camera.setParameters(parameters);
+            mCamera.setParameters(parameters);
 
         } catch (Exception ignored) {
             if (Camera.getNumberOfCameras() >= 2) {
                 try {
-                    camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                    mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                 } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 try {
-                    camera = Camera.open();
+                    mCamera = Camera.open();
                 } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to camera service", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -263,7 +263,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     public void takePicture() {
         orientationListener.rememberOrientation();
 
-        camera.takePicture(null, null, this);
+        mCamera.takePicture(null, null, this);
     }
 
 
@@ -349,37 +349,62 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     private void stopCamera() {
         stopCameraPreview();
-        camera.release();
+        mCamera.release();
     }
 
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        mCamera = null;
 
-        camera.setDisplayOrientation(90);
+        if (Camera.getNumberOfCameras() == 0) {
+            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast.LENGTH_LONG).show();
+            return;
+        }
+        //First try to open a front facing camera
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                mCamera = Camera.open(i);
+                break;
+            }
+        }
+
+        //There were no front facing cameras, try to find a rear-facing one
+        if (mCamera == null) {
+            mCamera = Camera.open();
+        }
+
+        //Ah well, who really wants a camera anyway?
+        if (mCamera == null) {
+            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        mCamera.setDisplayOrientation(90);
 
         // stop preview before making changes
         try {
-            camera.stopPreview();
+            mCamera.stopPreview();
         } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
 
         // set preview size and make any resize, rotate or
         // reformatting changes here
-        Camera.Parameters params = camera.getParameters();
+        Camera.Parameters params = mCamera.getParameters();
         params.set("orientation", "portrait");
         Camera.Size optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(), getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
         params.setPreviewSize(optimalSize.width, optimalSize.height);
-        camera.setParameters(params);
+        mCamera.setParameters(params);
         // start preview with new settings
         try {
-            camera.setPreviewTexture(surface);
-            camera.startPreview();
+            mCamera.setPreviewTexture(surface);
+            mCamera.startPreview();
 
         } catch (Exception e) {
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+            Log.d(TAG, "Error starting mCamera preview: " + e.getMessage());
         }
     }
 
@@ -390,8 +415,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        camera.stopPreview();
-        camera.release();
+        mCamera.stopPreview();
+        mCamera.release();
         return true;
     }
 
