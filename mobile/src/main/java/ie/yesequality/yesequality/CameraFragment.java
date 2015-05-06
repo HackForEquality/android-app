@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,15 +33,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 640;
     TextureView previewView;
-    private int cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera mCamera;
-    private SurfaceHolder surfaceHolder;
     private CameraFragmentListener listener;
     private int displayOrientation;
     private int layoutOrientation;
     private ImageView ivWaterMarkPic;
     private CameraOrientationListener orientationListener;
-    private int actionBarSize;
     private RelativeLayout rlSurfaceLayout;
 
     private static int getDegreesFromRotation(int rotation) {
@@ -129,72 +125,33 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //        stopCamera();
 //    }
 
-    /**
-     * Start the mCamera preview.
-     */
-    private synchronized void startCameraPreview() {
-        determineDisplayOrientation();
-        setupCamera();
-
-        try {
-            mCamera.setPreviewDisplay(surfaceHolder);
-            mCamera.startPreview();
-        } catch (Exception exception) {
-            Log.e(TAG, "Can't start mCamera preview due to Exception", exception);
-
-            listener.onCameraError();
-        }
-    }
-
-    /**
-     * Stop the mCamera preview.
-     */
-    private synchronized void stopCameraPreview() {
-        try {
-            mCamera.stopPreview();
-        } catch (Exception exception) {
-            Log.i(TAG, "Exception during stopping mCamera preview");
-        }
-    }
 
     /**
      * Determine the current display orientation and rotate the mCamera preview
      * accordingly.
      */
-    public void determineDisplayOrientation() {
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        Camera.getCameraInfo(cameraId, cameraInfo);
-
-        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay()
-                .getRotation());
-
-
-        int displayOrientation;
-
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            displayOrientation = (cameraInfo.orientation + degrees) % 360;
-            displayOrientation = (360 - displayOrientation) % 360;
-        } else {
-            displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
-        }
-
-        this.displayOrientation = displayOrientation;
-        this.layoutOrientation = degrees;
-        // Calculate ActionBar height
-//        TypedValue tv = new TypedValue();
-//        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-//            this.actionBarSize = TypedValue.complexToDimensionPixelSize(tv.data, getResources()
-// .getDisplayMetrics());
+//    public void determineDisplayOrientation() {
+//        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+//        Camera.getCameraInfo(cameraId, cameraInfo);
+//
+//        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay()
+//                .getRotation());
+//
+//
+//        int displayOrientation;
+//
+//        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//            displayOrientation = (cameraInfo.orientation + degrees) % 360;
+//            displayOrientation = (360 - displayOrientation) % 360;
 //        } else {
-//            this.actionBarSize = (int) getResources().getDimension(R.dimen
-// .abc_action_bar_default_height_material);
+//            displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
 //        }
-
-        //this.actionBarSize = ((CameraMainActivityTest)getActivity()).tbActionBar.getHeight();
-
-
-        mCamera.setDisplayOrientation(displayOrientation);
-    }
+//
+//        this.displayOrientation = displayOrientation;
+//        this.layoutOrientation = degrees;
+//
+//        mCamera.setDisplayOrientation(displayOrientation);
+//    }
 
     /**
      * Setup the mCamera parameters.
@@ -351,16 +308,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 innerRect.height());
 
         return source;
-    }
-
-
-    private void startCamera() {
-
-    }
-
-    private void stopCamera() {
-        stopCameraPreview();
-        mCamera.release();
     }
 
 

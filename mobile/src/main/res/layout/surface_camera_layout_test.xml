@@ -43,7 +43,6 @@
         android:layout_height="75dp"
         android:layout_gravity="bottom|center"
         android:layout_margin="16dp"
-        android:onClick="takePicture"
         android:src="@drawable/ic_selfie" />
 
 </FrameLayout>

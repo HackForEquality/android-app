@@ -33,6 +33,7 @@ import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import ie.yesequality.yesequality.views.CameraFragmentListener;
 import ie.yesequality.yesequality.views.CameraOverlayView;
 
@@ -155,6 +156,15 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
                 ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
                 ivWaterMarkPic.setVisibility(View.VISIBLE);
+                ivWaterMarkPic.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        //You can't run this function until the ImageView has finished laying out with the new image
+                        moveWaterMarkWithinBounds();
+                        ivWaterMarkPic.removeOnLayoutChangeListener(this);
+                    }
+                });
+
             }
         });
 
@@ -170,6 +180,30 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
             }
         });
     }
+
+
+    void moveWaterMarkWithinBounds() {
+        float internalX = ivWaterMarkPic.getX();
+        float internalY = ivWaterMarkPic.getY();
+
+        if (internalX < ivWaterMarkPic.getWidth() / 2) {
+            ivWaterMarkPic.setX(0);
+        } else if (rlSurfaceLayout.getWidth() - internalX < ivWaterMarkPic.getWidth() / 2) {
+            ivWaterMarkPic.setX(rlSurfaceLayout.getWidth() - ivWaterMarkPic.getWidth());
+        } /*else {
+            ivWaterMarkPic.setX(internalX - (ivWaterMarkPic.getWidth() / 2));
+        }*/
+
+
+        if (internalY < ivWaterMarkPic.getHeight() / 2) {
+            ivWaterMarkPic.setY(0);
+        } else if (rlSurfaceLayout.getHeight() - internalY < ivWaterMarkPic.getHeight() / 2) {
+            ivWaterMarkPic.setY(rlSurfaceLayout.getHeight() - ivWaterMarkPic.getHeight());
+        } /*else {
+            ivWaterMarkPic.setY(internalY - (ivWaterMarkPic.getHeight() / 2));
+        }*/
+    }
+
 
 
     @Override
@@ -193,11 +227,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         finish();
     }
 
-    /**
-     * The user wants to take a picture.
-     *
-     * @param view
-     */
+    @OnClick(R.id.selfieButton)
     public void takePicture(View view) {
         view.setEnabled(false);
 
