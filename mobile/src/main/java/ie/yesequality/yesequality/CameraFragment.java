@@ -27,7 +27,8 @@ import java.util.List;
 import ie.yesequality.yesequality.views.CameraFragmentListener;
 import ie.yesequality.yesequality.views.CameraOrientationListener;
 
-public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener, Camera.PictureCallback {
+public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener,
+        Camera.PictureCallback {
     public static final String TAG = "CameraFragment";
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
@@ -85,7 +86,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
      * On creating view for fragment.
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
         previewView = new TextureView(getActivity());
 
         previewView.setSurfaceTextureListener(this);
@@ -163,7 +165,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(cameraId, cameraInfo);
 
-        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation());
+        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay()
+                .getRotation());
 
 
         int displayOrientation;
@@ -180,9 +183,11 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         // Calculate ActionBar height
 //        TypedValue tv = new TypedValue();
 //        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-//            this.actionBarSize = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+//            this.actionBarSize = TypedValue.complexToDimensionPixelSize(tv.data, getResources()
+// .getDisplayMetrics());
 //        } else {
-//            this.actionBarSize = (int) getResources().getDimension(R.dimen.abc_action_bar_default_height_material);
+//            this.actionBarSize = (int) getResources().getDimension(R.dimen
+// .abc_action_bar_default_height_material);
 //        }
 
         //this.actionBarSize = ((CameraMainActivityTest)getActivity()).tbActionBar.getHeight();
@@ -211,13 +216,15 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 try {
                     mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                 } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast
+                            .LENGTH_SHORT).show();
                 }
             } else {
                 try {
                     mCamera = Camera.open();
                 } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast
+                            .LENGTH_SHORT).show();
                 }
             }
         }
@@ -267,7 +274,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
 
-    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float left, float top, int parentWidth, int parentHeight) {
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float left, float top, int parentWidth, int
+            parentHeight) {
         Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
 
@@ -277,7 +285,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         float horizontalScale = ((float) bmp2.getWidth() / parentWidth) * bmp1.getWidth();
         float verticalScale = ((float) bmp2.getHeight() / parentHeight) * bmp1.getHeight();
 
-        bmp2 = Bitmap.createScaledBitmap(bmp2, (int) (horizontalScale), (int) (verticalScale), false);
+        bmp2 = Bitmap.createScaledBitmap(bmp2, (int) (horizontalScale), (int) (verticalScale),
+                false);
 
         canvas.drawBitmap(bmp1, 0, 0, null);
 
@@ -320,7 +329,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         bitmap = cropBitmapToSquare(bitmap);
 
-        bitmap = overlay(bitmap, waterMark, ivWaterMarkPic.getX(), ivWaterMarkPic.getY(), rlSurfaceLayout.getWidth(), rlSurfaceLayout.getHeight());
+        bitmap = overlay(bitmap, waterMark, ivWaterMarkPic.getX(), ivWaterMarkPic.getY(),
+                rlSurfaceLayout.getWidth(), rlSurfaceLayout.getHeight());
 
 
         listener.onPictureTaken(bitmap);
@@ -337,7 +347,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         Rect innerRect = new Rect(l, t, r, b);
 
 
-        source = Bitmap.createBitmap(source, innerRect.left, innerRect.top, innerRect.width(), innerRect.height());
+        source = Bitmap.createBitmap(source, innerRect.left, innerRect.top, innerRect.width(),
+                innerRect.height());
 
         return source;
     }
@@ -358,15 +369,20 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         mCamera = null;
 
         if (Camera.getNumberOfCameras() == 0) {
-            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast
+                    .LENGTH_LONG).show();
             return;
         }
+
+        int orientation = 90;
         //First try to open a front facing camera
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
             Camera.getCameraInfo(i, cameraInfo);
+
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 mCamera = Camera.open(i);
+                orientation = cameraInfo.orientation;
                 break;
             }
         }
@@ -378,11 +394,14 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         //Ah well, who really wants a camera anyway?
         if (mCamera == null) {
-            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), getString(R.string.error_unable_to_connect), Toast
+                    .LENGTH_LONG).show();
             return;
         }
 
-        mCamera.setDisplayOrientation(90);
+        int rotation = getActivity().getWindowManager().getDefaultDisplay()
+                .getRotation();
+        mCamera.setDisplayOrientation(Math.abs(180 - orientation));
 
         // stop preview before making changes
         try {
@@ -395,7 +414,9 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         // reformatting changes here
         Camera.Parameters params = mCamera.getParameters();
         params.set("orientation", "portrait");
-        Camera.Size optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(), getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+        Camera.Size optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(),
+                getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics
+                        ().heightPixels);
         params.setPreviewSize(optimalSize.width, optimalSize.height);
         mCamera.setParameters(params);
         // start preview with new settings
