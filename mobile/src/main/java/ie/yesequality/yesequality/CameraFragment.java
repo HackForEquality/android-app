@@ -41,6 +41,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private CameraOrientationListener orientationListener;
     private RelativeLayout rlSurfaceLayout;
     private Camera.Size optimalSize;
+    private int mCameraId;
 
     private static int getDegreesFromRotation(int rotation) {
 
@@ -65,8 +66,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
      * Determine the current display orientation and rotate the mCamera preview
      * accordingly.
      */
-    public static void setCameraDisplayOrientation(Activity activity,
-                                                   int cameraId, android.hardware.Camera camera) {
+    public static int setCameraDisplayOrientation(Activity activity,
+                                                  int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
@@ -95,7 +96,9 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
-        camera.setDisplayOrientation(result);
+
+        return result;
+
     }
 
     /**
@@ -130,7 +133,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
 
-
     /**
      * On fragment getting resumed.
      */
@@ -144,9 +146,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             mCamera.startPreview();
         }
     }
-
-
-
 
 
     /**
@@ -186,14 +185,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
      */
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
-
-
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-
 
         Matrix matrix = new Matrix();
         matrix.preScale(1, -1);
-        matrix.postRotate(270);
+
+        matrix.postRotate((180 + setCameraDisplayOrientation(getActivity(), mCameraId,
+                mCamera)) % 360);
 
         bitmap = Bitmap.createBitmap(
                 bitmap,
@@ -249,7 +247,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             return;
         }
 
-        int cameraId = 0;
+        mCameraId = 0;
         //First try to open a front facing camera
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
@@ -257,7 +255,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 mCamera = Camera.open(i);
-                cameraId = i;
+                mCameraId = i;
                 break;
             }
         }
@@ -274,7 +272,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             return;
         }
 
-        setCameraDisplayOrientation(getActivity(), cameraId, mCamera);
+        mCamera.setDisplayOrientation(setCameraDisplayOrientation(getActivity(), mCameraId,
+                mCamera));
 
         // stop preview before making changes
         try {
