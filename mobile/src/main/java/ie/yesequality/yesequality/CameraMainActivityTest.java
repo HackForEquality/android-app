@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -93,11 +96,13 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_info:
-                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity.class);
+                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity
+                                .class);
                         startActivity(infoIntent);
                         return true;
                     case R.id.action_reminders:
-                        Intent reminderIntent = new Intent(CameraMainActivityTest.this, NotificationActivity.class);
+                        Intent reminderIntent = new Intent(CameraMainActivityTest.this,
+                                NotificationActivity.class);
                         startActivity(reminderIntent);
                         return true;
 
@@ -128,7 +133,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                     case MotionEvent.ACTION_MOVE:
                         // This filters out smaller motions to try and stop the badge from
                         // shifting around while the user is trying to click on it.
-                        if (Math.abs(downX - event.getX()) + Math.abs(downY - event.getY()) > 16 * getResources().getDisplayMetrics().density) {
+                        if (Math.abs(downX - event.getX()) + Math.abs(downY - event.getY()) > 16
+                                * getResources().getDisplayMetrics().density) {
                             ClipData data = ClipData.newPlainText("", "");
                             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                             v.startDrag(data, shadowBuilder, v, 0);
@@ -148,6 +154,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         ivWaterMarkPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit().putBoolean
+                        (Constants.WATERMARK_CLICKED, true).apply();
                 if (mSelectedBadge >= mVoteBadges.length - 1) {
                     mSelectedBadge = 0;
                 } else {
@@ -158,8 +166,11 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                 ivWaterMarkPic.setVisibility(View.VISIBLE);
                 ivWaterMarkPic.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        //You can't run this function until the ImageView has finished laying out with the new image
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                               int oldLeft, int oldTop, int oldRight, int
+                                                       oldBottom) {
+                        //You can't run this function until the ImageView has finished laying out
+                        // with the new image
                         moveWaterMarkWithinBounds();
                         ivWaterMarkPic.removeOnLayoutChangeListener(this);
                     }
@@ -172,13 +183,31 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
         rlSurfaceLayout.setOnDragListener(new BadgeDragListener());
         cameraOverlayView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int
+                    oldLeft, int oldTop, int oldRight, int oldBottom) {
                 Rect overlayInnerRect = cameraOverlayView.getInnerRect();
-                rlSurfaceLayout.setLayoutParams(new FrameLayout.LayoutParams(overlayInnerRect.width(), overlayInnerRect.height(), Gravity.CENTER));
+                rlSurfaceLayout.setLayoutParams(new FrameLayout.LayoutParams(overlayInnerRect
+                        .width(), overlayInnerRect.height(), Gravity.CENTER));
 
                 cameraOverlayView.removeOnLayoutChangeListener(this);
             }
         });
+
+        if (!getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).getBoolean(Constants
+                .WATERMARK_CLICKED, false)) {
+            showCustomToast("Tap the badge!");
+        }
+    }
+
+    private void showCustomToast(String message) {
+        Toast toast = new Toast(this);
+        TextView textView = (TextView) LayoutInflater.from(this).inflate(R.layout.toast, null);
+        textView.setText(message);
+        textView.setTextColor(Color.WHITE);
+        toast.setView(textView);
+        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT, 0, 0);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
     }
 
 
@@ -203,7 +232,6 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
             ivWaterMarkPic.setY(internalY - (ivWaterMarkPic.getHeight() / 2));
         }*/
     }
-
 
 
     @Override
@@ -231,7 +259,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
     public void takePicture(View view) {
         view.setEnabled(false);
 
-        CameraFragment fragment = (CameraFragment) getSupportFragmentManager().findFragmentById(R.id.camera_fragment);
+        CameraFragment fragment = (CameraFragment) getSupportFragmentManager().findFragmentById(R
+                .id.camera_fragment);
 
 
         fragment.takePicture();
@@ -256,7 +285,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
             }
         }
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format
+                (new Date());
         File mediaFile = new File(
                 mediaStorageDir.getPath() + File.separator + "yesequal_" + timeStamp + ".jpg"
         );
@@ -326,7 +356,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
                     if (internalY < eventView.getHeight() / 2) {
                         eventView.setY(0);
-                    } else if (rlSurfaceLayout.getHeight() - internalY < eventView.getHeight() / 2) {
+                    } else if (rlSurfaceLayout.getHeight() - internalY < eventView.getHeight() /
+                            2) {
                         eventView.setY(rlSurfaceLayout.getHeight() - eventView.getHeight());
                     } else {
                         eventView.setY(internalY - (eventView.getHeight() / 2));

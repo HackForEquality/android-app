@@ -40,6 +40,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private ImageView ivWaterMarkPic;
     private CameraOrientationListener orientationListener;
     private RelativeLayout rlSurfaceLayout;
+    private Camera.Size optimalSize;
 
     private static int getDegreesFromRotation(int rotation) {
 
@@ -128,17 +129,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         return previewView;
     }
 
-    /**
-     * On fragment getting paused.
-     */
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//
-//        orientationListener.disable();
-//
-//        stopCamera();
-//    }
+
 
     /**
      * On fragment getting resumed.
@@ -152,83 +143,11 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         if (previewView.getSurfaceTexture() != null && mCamera != null) {
             mCamera.startPreview();
         }
-//        try {
-//            startCamera();
-//        } catch (Exception exception) {
-//            Log.e(TAG, "Can't open mCamera with id " + cameraId, exception);
-//
-//            listener.onCameraError();
-//            return;
-//        }
     }
 
-    /**
-     * Setup the mCamera parameters.
-     */
-    public void setupCamera() {
-        Camera.Parameters parameters = mCamera.getParameters();
 
-        Camera.Size bestPreviewSize = determineBestPreviewSize(parameters);
-        Camera.Size bestPictureSize = determineBestPictureSize(parameters);
 
-        parameters.setPreviewSize(bestPictureSize.width, bestPreviewSize.height);
-        parameters.setPictureSize(bestPictureSize.width, bestPictureSize.height);
 
-        try {
-            mCamera.setParameters(parameters);
-
-        } catch (Exception ignored) {
-            if (Camera.getNumberOfCameras() >= 2) {
-                try {
-                    mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-                } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast
-                            .LENGTH_SHORT).show();
-                }
-            } else {
-                try {
-                    mCamera = Camera.open();
-                } catch (Exception ex) {
-                    Toast.makeText(getActivity(), "Fail to connect to mCamera service", Toast
-                            .LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    private Camera.Size determineBestPreviewSize(Camera.Parameters parameters) {
-        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-
-        return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
-    }
-
-    private Camera.Size determineBestPictureSize(Camera.Parameters parameters) {
-        List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
-
-        return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
-    }
-
-    protected Camera.Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
-        Camera.Size bestSize = null;
-
-        for (Camera.Size currentSize : sizes) {
-            boolean isDesiredRatio = (currentSize.width / 4) == (currentSize.height / 3);
-            boolean isBetterSize = (bestSize == null || currentSize.width > bestSize.width);
-            boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
-
-            if (isDesiredRatio && isInBounds && isBetterSize) {
-                bestSize = currentSize;
-            }
-        }
-
-        if (bestSize == null) {
-            listener.onCameraError();
-
-            return sizes.get(0);
-        }
-
-        return bestSize;
-    }
 
     /**
      * Take a picture and notify the listener once the picture is taken.
@@ -368,7 +287,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         // reformatting changes here
         Camera.Parameters params = mCamera.getParameters();
         params.set("orientation", "portrait");
-        Camera.Size optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(),
+        optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(),
                 getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics
                         ().heightPixels);
         params.setPreviewSize(optimalSize.width, optimalSize.height);
