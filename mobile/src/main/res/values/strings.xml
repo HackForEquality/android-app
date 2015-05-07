@@ -57,8 +57,8 @@
     <string name="explanation_message_one_line">Tap the text to choose other messages.</string>
     <string name="error_unable_to_connect">Unable to connect to the camera :(</string>
 
-    <string name="alarmSetDay">Alarm set for Voting Day</string>
-    <string name="alarmSetDayBefore">Alarm set for Day before Voting Day</string>
-    <string name="alarmCancelDay">Alarm cancelled for Voting Day</string>
-    <string name="alarmCancelDayBefore">Alarm cancelled for Day before Voting Day</string>
+    <string name="alarmSetDay">Reminder set for Voting Day</string>
+    <string name="alarmSetDayBefore">Reminder set for Day before Voting Day</string>
+    <string name="alarmCancelDay">Reminder cancelled for Voting Day</string>
+    <string name="alarmCancelDayBefore">Reminder cancelled for Day before Voting Day</string>
 </resources>
