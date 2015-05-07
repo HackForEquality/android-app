@@ -74,17 +74,17 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
                 R.string.information_page_string_seven, R.string.information_page_string_eight,
                 R.color.dark_navy, "http://www.checktheregister.ie", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon6,
-                R.string.information_page_string_nine, R.string.information_page_string_ten,
-                R.color.dark_green, "https://www.yesequality.ie/?attachment_id=1283", R.color.white));
-
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon7,
-                R.string.information_page_string_nine, R.string.information_page_string_eleven,
-                R.color.dark_magenta, "", R.color.white));
-
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon8,
-                R.string.information_page_string_nine, R.string.information_page_string_twelve,
-                R.color.dark_red, "", R.color.white));
+//        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon6,
+//                R.string.information_page_string_nine, R.string.information_page_string_ten,
+//                R.color.dark_green, "https://www.yesequality.ie/?attachment_id=1283", R.color.white));
+//
+//        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon7,
+//                R.string.information_page_string_nine, R.string.information_page_string_eleven,
+//                R.color.dark_magenta, "", R.color.white));
+//
+//        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon8,
+//                R.string.information_page_string_nine, R.string.information_page_string_twelve,
+//                R.color.dark_red, "", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon9,
                 R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
