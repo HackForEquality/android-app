@@ -61,6 +61,43 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
     /**
+     * Determine the current display orientation and rotate the mCamera preview
+     * accordingly.
+     */
+    public static void setCameraDisplayOrientation(Activity activity,
+                                                   int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }
+
+    /**
      * On activity getting attached.
      */
     @Override
@@ -92,6 +129,18 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
     /**
+     * On fragment getting paused.
+     */
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//
+//        orientationListener.disable();
+//
+//        stopCamera();
+//    }
+
+    /**
      * On fragment getting resumed.
      */
     @Override
@@ -112,46 +161,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //            return;
 //        }
     }
-
-    /**
-     * On fragment getting paused.
-     */
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//
-//        orientationListener.disable();
-//
-//        stopCamera();
-//    }
-
-
-    /**
-     * Determine the current display orientation and rotate the mCamera preview
-     * accordingly.
-     */
-//    public void determineDisplayOrientation() {
-//        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-//        Camera.getCameraInfo(cameraId, cameraInfo);
-//
-//        int degrees = getDegreesFromRotation(getActivity().getWindowManager().getDefaultDisplay()
-//                .getRotation());
-//
-//
-//        int displayOrientation;
-//
-//        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-//            displayOrientation = (cameraInfo.orientation + degrees) % 360;
-//            displayOrientation = (360 - displayOrientation) % 360;
-//        } else {
-//            displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
-//        }
-//
-//        this.displayOrientation = displayOrientation;
-//        this.layoutOrientation = degrees;
-//
-//        mCamera.setDisplayOrientation(displayOrientation);
-//    }
 
     /**
      * Setup the mCamera parameters.
@@ -321,7 +330,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             return;
         }
 
-        int orientation = 90;
+        int cameraId = 0;
         //First try to open a front facing camera
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
@@ -329,7 +338,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 mCamera = Camera.open(i);
-                orientation = cameraInfo.orientation;
+                cameraId = i;
                 break;
             }
         }
@@ -346,9 +355,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             return;
         }
 
-        int rotation = getActivity().getWindowManager().getDefaultDisplay()
-                .getRotation();
-        mCamera.setDisplayOrientation(Math.abs(rotation - 90));
+        setCameraDisplayOrientation(getActivity(), cameraId, mCamera);
 
         // stop preview before making changes
         try {
