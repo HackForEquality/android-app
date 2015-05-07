@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -31,6 +33,10 @@ public class NotificationActivity extends ActionBarActivity {
     protected SwitchCompat dayBefore;
     @InjectView(R.id.switchOnDay)
     protected SwitchCompat onDay;
+    @InjectView(R.id.tvOnDay)
+    protected TextView tvOnDay;
+    @InjectView(R.id.tvDayBefore)
+    protected TextView tvDayBefore;
     private AlarmManager alarmManagerOnDay;
     private AlarmManager alarmManagerOnDayBefore;
     private PendingIntent alarmIntentOnDay;
@@ -55,13 +61,19 @@ public class NotificationActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 editor.putBoolean(ON_DAY, isChecked);
-                editor.commit();
-                if (isChecked){
+                editor.apply();
+                if (isChecked) {
                     registerAlarm(true);
-                }
-                else {
+                } else {
                     cancelAlarm(true);
                 }
+            }
+        });
+
+        tvOnDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDay.toggle();
             }
         });
 
@@ -69,13 +81,18 @@ public class NotificationActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 editor.putBoolean(ON_DAY_BEFORE, isChecked);
-                editor.commit();
-                if (isChecked){
+                editor.apply();
+                if (isChecked) {
                     registerAlarm(false);
-                }
-                else {
+                } else {
                     cancelAlarm(false);
                 }
+            }
+        });
+        tvDayBefore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dayBefore.toggle();
             }
         });
 
