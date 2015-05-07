@@ -58,7 +58,7 @@
     <string name="error_unable_to_connect">Unable to connect to the camera :(</string>
 
     <string name="alarmSetDay">Reminder set for voting day</string>
-    <string name="alarmSetDayBefore">Reminder set for day before doting day</string>
-    <string name="alarmCancelDay">Reminder cancelled for doting day</string>
+    <string name="alarmSetDayBefore">Reminder set for day before voting day</string>
+    <string name="alarmCancelDay">Reminder cancelled for voting day</string>
     <string name="alarmCancelDayBefore">Reminder cancelled for day before voting day</string>
 </resources>
