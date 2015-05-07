@@ -16,4 +16,6 @@
     <color name="dark_navy">#282561</color>
     <color name="dark_green">#009447</color>
     <color name="dark_red">#bd202e</color>
+
+    <color name="grey">#cccccc</color>
 </resources>

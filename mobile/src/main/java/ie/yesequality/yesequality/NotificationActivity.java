@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -47,8 +48,8 @@ public class NotificationActivity extends ActionBarActivity {
 
         final SharedPreferences notificationPrefs = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = notificationPrefs.edit();
-        onDay.setChecked(notificationPrefs.getBoolean(ON_DAY, true));
-        dayBefore.setChecked(notificationPrefs.getBoolean(ON_DAY_BEFORE, true));
+        onDay.setChecked(notificationPrefs.getBoolean(ON_DAY, false));
+        dayBefore.setChecked(notificationPrefs.getBoolean(ON_DAY_BEFORE, false));
 
         onDay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -101,12 +102,14 @@ public class NotificationActivity extends ActionBarActivity {
             alarmIntentOnDay = PendingIntent.getBroadcast(this, ALARM_ID_ON_DAY, intent, 0);
             alarmManagerOnDay.set(AlarmManager.RTC_WAKEUP, dayBeforeVotingDay.getTimeInMillis(), alarmIntentOnDay);
             Log.i("NOTIFICATIONACTIVITY", "Setting up Alarm for voting day on: " + dayBeforeVotingDay.getTime());
+            Toast.makeText(this, R.string.alarmSetDay, Toast.LENGTH_SHORT).show();
         }
         else {
             // Register alarm for day before voting day
             alarmIntentOnDayBefore = PendingIntent.getBroadcast(this, ALARM_ID_ON_DAY_BEFORE, intent, 0);
             alarmManagerOnDayBefore.set(AlarmManager.RTC_WAKEUP, dayBeforeVotingDay.getTimeInMillis(), alarmIntentOnDayBefore);
             Log.i("NOTIFICATIONACTIVITY", "Setting up Alarm for day before voting day on: " + dayBeforeVotingDay.getTime());
+            Toast.makeText(this, R.string.alarmSetDayBefore, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -122,6 +125,7 @@ public class NotificationActivity extends ActionBarActivity {
                 }
                 alarmManagerOnDay.cancel(alarmIntentOnDay);
                 Log.i("NOTIFICATIONACTIVITY", "Canceled Alarm for voting day");
+                Toast.makeText(this, R.string.alarmCancelDay, Toast.LENGTH_SHORT).show();
             }
         }
         else {
@@ -131,6 +135,7 @@ public class NotificationActivity extends ActionBarActivity {
                 }
                 alarmManagerOnDayBefore.cancel(alarmIntentOnDayBefore);
                 Log.i("NOTIFICATIONACTIVITY", "Canceled Alarm for day before voting day");
+                Toast.makeText(this, R.string.alarmCancelDayBefore, Toast.LENGTH_SHORT).show();
             }
         }
     }
