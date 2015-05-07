@@ -4,17 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
 import ie.yesequality.yesequality.R;
 
 public class CameraOverlayView extends View {
-    TextPaint textPaint = new TextPaint();
-    Rect textRect = new Rect();
     Rect innerRect = new Rect();
     Rect outerRect = new Rect();
+    Paint paint = new Paint();
     private Rect aboveRect;
     private Rect leftRect;
     private Rect rightRect;
@@ -47,31 +45,12 @@ public class CameraOverlayView extends View {
     @Override
     public void onDraw(Canvas canvas) {
 
-
-        Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(getResources().getColor(R.color.transparent_white));
         canvas.drawRect(aboveRect, paint);
         canvas.drawRect(leftRect, paint);
         canvas.drawRect(rightRect, paint);
         canvas.drawRect(bottomRect, paint);
-
-        if (aboveRect.height() > 0 && aboveRect.width() > 0) {
-            textPaint.setAntiAlias(true);
-            textPaint.setColor(getResources().getColor(R.color.green));
-
-            textPaint.setTextAlign(Paint.Align.CENTER);
-
-            String explanation = getContext().getString(R.string.explanation_message_one_line);
-
-            float scale = (aboveRect.width() - 2 * getResources().getDimension(R.dimen.activity_horizontal_margin)) / textPaint.measureText(explanation);
-            textPaint.setTextSize(textPaint.getTextSize() * scale);
-
-
-            textPaint.getTextBounds(explanation, 0, explanation.length(), textRect);
-
-            canvas.drawText(explanation, aboveRect.centerX(), aboveRect.height() - textRect.height(), textPaint);
-        }
 
     }
 
