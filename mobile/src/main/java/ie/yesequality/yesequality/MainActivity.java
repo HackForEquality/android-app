@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.viewpagerindicator.CirclePageIndicator;
@@ -16,7 +17,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class MainActivity extends ActionBarActivity implements PageAdapter.PagerListener {
-
 
     @InjectView(R.id.indicator)
     protected CirclePageIndicator indicator;
@@ -32,10 +32,7 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
         ButterKnife.inject(this);
 
         List<Fragment> fragments = getFragmentList();
-
-
         mPageAdapter = new PageAdapter(getSupportFragmentManager(), fragments, this);
-
 
         pager.setAdapter(mPageAdapter);
         pager.setPageTransformer(true, new DepthPageTransformer());
@@ -45,9 +42,6 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lilac)));
-
-
-
     }
 
 
@@ -59,8 +53,8 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
                 R.color.lilac, "", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon2,
-                R.string.information_page_string_two, R.string.information_page_string_four, R.color.dark_cyan, "",
-                R.color.white));
+                R.string.information_page_string_two, R.string.information_page_string_four,
+                R.color.dark_cyan, "", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon3,
                 R.string.information_page_string_two, R.string.information_page_string_five,
@@ -99,28 +93,21 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.navy));
                 break;
             case 4:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_lilac));
                 break;
             case 5:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_navy));
                 break;
             case 6:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_green));
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
                 break;
             case 7:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_magenta));
-                break;
-            case 8:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_red));
-                break;
-            case 9:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.white));
                 break;
             default:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
                 break;
         }
-
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
     }
