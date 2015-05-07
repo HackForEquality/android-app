@@ -348,7 +348,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         int rotation = getActivity().getWindowManager().getDefaultDisplay()
                 .getRotation();
-        mCamera.setDisplayOrientation(Math.abs(180 - orientation));
+        mCamera.setDisplayOrientation(Math.abs(rotation - 90));
 
         // stop preview before making changes
         try {
