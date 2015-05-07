@@ -28,16 +28,16 @@ public class PhotoActivity extends ActionBarActivity {
     @InjectView(R.id.ivWaterMarkPic)
     protected ImageView ivWaterMarkPic;
     private Uri uri;
-    private int[] mVoteBadges = new int[]{R.drawable.ic_vote_for_me,
-            R.drawable.ic_vote_for_me_color,
-            R.drawable.ic_yes_im_voting,
-            R.drawable.ic_yes_im_voting_color,
-            R.drawable.ic_we_voting,
-            R.drawable.ic_we_voting_color,
-            R.drawable.ic_ta,
-            R.drawable.ic_ta_color,
-            R.drawable.ic_yes,
-            R.drawable.ic_yes_color
+    private int[] mVoteBadges = new int[]{R.drawable.ic_wm_vote_for_me,
+            R.drawable.ic_wm_vote_for_me_color,
+            R.drawable.ic_wm_yes_im_voting,
+            R.drawable.ic_wm_yes_im_voting_color,
+            R.drawable.ic_wm_we_voting,
+            R.drawable.ic_wm_we_voting_color,
+            R.drawable.ic_wm_ta,
+            R.drawable.ic_wm_ta_color,
+            R.drawable.ic_wm_yes,
+            R.drawable.ic_wm_yes_color
     };
 
     private int mSelectedBadge = 0;

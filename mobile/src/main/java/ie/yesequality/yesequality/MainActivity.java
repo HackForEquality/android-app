@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
                 R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
                 R.color.green, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_yes_color,
+        fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_wm_yes_color,
                 R.string.information_page_string_seventeen, R.string.information_page_string_eighteen,
                 R.color.white, "http://www.yesequality.ie", R.color.black));
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
@@ -30,37 +31,16 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         Camera.PictureCallback {
     public static final String TAG = "CameraFragment";
 
-    private static final int PICTURE_SIZE_MAX_WIDTH = 1280;
-    private static final int PREVIEW_SIZE_MAX_WIDTH = 640;
     TextureView previewView;
     private Camera mCamera;
     private CameraFragmentListener listener;
-    private int displayOrientation;
-    private int layoutOrientation;
     private ImageView ivWaterMarkPic;
     private CameraOrientationListener orientationListener;
     private RelativeLayout rlSurfaceLayout;
     private Camera.Size optimalSize;
     private int mCameraId;
 
-    private static int getDegreesFromRotation(int rotation) {
 
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                return 0;
-
-            case Surface.ROTATION_90:
-                return 90;
-
-
-            case Surface.ROTATION_180:
-                return 180;
-
-            case Surface.ROTATION_270:
-            default:
-                return 270;
-        }
-    }
 
     /**
      * Determine the current display orientation and rotate the mCamera preview
@@ -158,10 +138,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
 
+
+
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float left, float top, int parentWidth, int
             parentHeight) {
-        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
-        Canvas canvas = new Canvas(bmOverlay);
+        //Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1
+        // .getConfig());
+        Canvas canvas = new Canvas(bmp1);
 
         float overlayLeft = (left / parentWidth) * bmp1.getWidth();
         float overlayTop = (top / parentHeight) * bmp1.getHeight();
@@ -169,15 +152,35 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         float horizontalScale = ((float) bmp2.getWidth() / parentWidth) * bmp1.getWidth();
         float verticalScale = ((float) bmp2.getHeight() / parentHeight) * bmp1.getHeight();
 
-        bmp2 = Bitmap.createScaledBitmap(bmp2, (int) (horizontalScale), (int) (verticalScale),
-                false);
+        bmp2 = bitmapScaler(bmp2, (int) horizontalScale, (int) verticalScale);
 
-        canvas.drawBitmap(bmp1, 0, 0, null);
+        //canvas.drawBitmap(bmp1, 0, 0, null);
 
-        canvas.drawBitmap(bmp2, overlayLeft, overlayTop, null);
+        canvas.drawBitmap(bmp2, overlayLeft, overlayTop, new Paint(Paint.FILTER_BITMAP_FLAG));
 
 
-        return bmOverlay;
+        return bmp1;
+    }
+
+    private Bitmap bitmapScaler(Bitmap bitmap, int newWidth, int newHeight) {
+        Bitmap scaledBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
+
+        float ratioX = newWidth / (float) bitmap.getWidth();
+        float ratioY = newHeight / (float) bitmap.getHeight();
+        float middleX = newWidth / 2.0f;
+        float middleY = newHeight / 2.0f;
+
+        Matrix scaleMatrix = new Matrix();
+        scaleMatrix.setScale(ratioX, ratioY, middleX, middleY);
+
+        Canvas canvas = new Canvas(scaledBitmap);
+        canvas.setMatrix(scaleMatrix);
+        Paint paint =new Paint(Paint.FILTER_BITMAP_FLAG);
+        paint.setAntiAlias(true);
+        canvas.drawBitmap(bitmap, middleX - bitmap.getWidth() / 2, middleY - bitmap.getHeight() /
+                2,paint );
+
+        return scaledBitmap;
     }
 
     /**
