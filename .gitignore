@@ -5,3 +5,5 @@
 /build
 /captures
 *.iml
+release.keystore
+yesequality.properties
