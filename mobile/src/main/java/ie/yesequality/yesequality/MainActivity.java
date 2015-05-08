@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.viewpagerindicator.CirclePageIndicator;
@@ -38,6 +37,22 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
         pager.setPageTransformer(true, new DepthPageTransformer());
 
         indicator.setViewPager(pager);
+        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                getPosition(position);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -83,26 +98,23 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
     public void getPosition(int position) {
         ColorDrawable colorDrawable;
         switch (position) {
-            case 1:
+            case 0:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
                 break;
-            case 2:
+            case 1:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_cyan));
                 break;
-            case 3:
+            case 2:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.navy));
                 break;
-            case 4:
+            case 3:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_lilac));
                 break;
-            case 5:
+            case 4:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_navy));
                 break;
-            case 6:
+            case 5:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
-                break;
-            case 7:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.white));
                 break;
             default:
                 colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
