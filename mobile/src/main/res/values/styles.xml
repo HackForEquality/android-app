@@ -1,8 +1,34 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/white</item>
+    </style>
+
+
+    <!-- Base application theme. -->
+    <style name="AppTheme.Camera" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentNavigation" tools:ignore="NewApi">true</item>
+
+    </style>
+
+
+    <style name="AppThemeDarkAction" parent="Theme.AppCompat.Light.DarkActionBar">
     <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/white</item>
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/green</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/red</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/grey</item>
     </style>
 
 </resources>

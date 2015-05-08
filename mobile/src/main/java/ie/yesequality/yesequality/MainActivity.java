@@ -1,9 +1,10 @@
 package ie.yesequality.yesequality;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
 import com.viewpagerindicator.CirclePageIndicator;
@@ -13,10 +14,8 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 
-public class MainActivity extends FragmentActivity {
-
+public class MainActivity extends ActionBarActivity implements PageAdapter.PagerListener {
 
     @InjectView(R.id.indicator)
     protected CirclePageIndicator indicator;
@@ -32,24 +31,34 @@ public class MainActivity extends FragmentActivity {
         ButterKnife.inject(this);
 
         List<Fragment> fragments = getFragmentList();
-
-
-        mPageAdapter = new PageAdapter(getSupportFragmentManager(), fragments);
-
+        mPageAdapter = new PageAdapter(getSupportFragmentManager(), fragments, this);
 
         pager.setAdapter(mPageAdapter);
         pager.setPageTransformer(true, new DepthPageTransformer());
 
         indicator.setViewPager(pager);
+        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                getPosition(position);
+            }
 
+            @Override
+            public void onPageSelected(int position) {
 
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lilac)));
     }
 
-    @OnClick(R.id.closeInfoButton)
-    protected void onCloseInfoClicked() {
-        finish();
-    }
 
 
     private List<Fragment> getFragmentList() {
@@ -59,8 +68,8 @@ public class MainActivity extends FragmentActivity {
                 R.color.lilac, "", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon2,
-                R.string.information_page_string_two, R.string.information_page_string_four, R.color.dark_cyan, "",
-                R.color.white));
+                R.string.information_page_string_two, R.string.information_page_string_four,
+                R.color.dark_cyan, "", R.color.white));
 
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon3,
                 R.string.information_page_string_two, R.string.information_page_string_five,
@@ -74,27 +83,45 @@ public class MainActivity extends FragmentActivity {
                 R.string.information_page_string_seven, R.string.information_page_string_eight,
                 R.color.dark_navy, "http://www.checktheregister.ie", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon6,
-                R.string.information_page_string_nine, R.string.information_page_string_ten,
-                R.color.dark_green, "https://www.yesequality.ie/?attachment_id=1283", R.color.white));
-
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon7,
-                R.string.information_page_string_nine, R.string.information_page_string_eleven,
-                R.color.dark_magenta, "", R.color.white));
-
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon8,
-                R.string.information_page_string_nine, R.string.information_page_string_twelve,
-                R.color.dark_red, "", R.color.white));
-
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon9,
                 R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
                 R.color.green, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_yes_color,
+        fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_wm_yes_color,
                 R.string.information_page_string_seventeen, R.string.information_page_string_eighteen,
                 R.color.white, "http://www.yesequality.ie", R.color.black));
 
         return fragments;
+    }
+
+    @Override
+    public void getPosition(int position) {
+        ColorDrawable colorDrawable;
+        switch (position) {
+            case 0:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
+                break;
+            case 1:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_cyan));
+                break;
+            case 2:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.navy));
+                break;
+            case 3:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_lilac));
+                break;
+            case 4:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_navy));
+                break;
+            case 5:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
+                break;
+            default:
+                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
+                break;
+        }
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
+
     }
 
     public class DepthPageTransformer implements ViewPager.PageTransformer {

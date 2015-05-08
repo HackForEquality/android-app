@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Yes Equality</string>
 
-    <string name="title_activity_camera_main">CameraMainActivity</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_camera_main">Yes Equality</string>
+    <string name="title_activity_main">Information</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -38,10 +38,6 @@
     <string name="information_page_string_six">Registered to vote</string>
     <string name="information_page_string_seven">Check to see if you are registered</string>
     <string name="information_page_string_eight">checktheregister.ie</string>
-    <string name="information_page_string_nine">Registering is easy</string>
-    <string name="information_page_string_ten">Download the form</string>
-    <string name="information_page_string_eleven">Get it signed &amp; stamped by a Garda</string>
-    <string name="information_page_string_twelve">Return it to your local authority office by May 5th</string>
     <string name="information_page_string_thirteen">On May 22nd</string>
     <string name="information_page_string_fourteen">Polling stations will be open from 7am to 10pm</string>
     <string name="information_page_string_fifteen">Away for work?</string>
@@ -49,7 +45,7 @@
     <string name="information_page_string_seventeen">And remember…</string>
     <string name="information_page_string_eighteen">Your vote counts. Don\'t forget to use it</string>
     <string name="closeInfoScreen">X</string>
-    <string name="title_activity_notification">NotificationActivity</string>
+    <string name="title_activity_notification">Dont Forget!</string>
     <string name="notificationDayBefore">Remind me the day before</string>
     <string name="NotificationOnDay">Remind me on the day</string>
     <string name="dontForgetOnDay">Don\'t forget to vote YES</string>
@@ -57,5 +53,12 @@
     <string name="dontForgetTitle">Don\'t Forget!</string>
     <string name="okButtonNotifications">OK</string>
     <string name="title_activity_camera_main2">CameraMain2Activity</string>
+    <!-- drawText will not draw multiple lines so this message must be only one line -->
+    <string name="explanation_message_one_line">Tap the text to choose other messages.</string>
+    <string name="error_unable_to_connect">Unable to connect to the camera :(</string>
 
+    <string name="alarmSetDay">Reminder set for voting day</string>
+    <string name="alarmSetDayBefore">Reminder set for day before voting day</string>
+    <string name="alarmCancelDay">Reminder cancelled for voting day</string>
+    <string name="alarmCancelDayBefore">Reminder cancelled for day before voting day</string>
 </resources>

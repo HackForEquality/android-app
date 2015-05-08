@@ -102,7 +102,6 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
         private float mCenterX;
         private float mCenterY;
         private Bitmap mBackgroundBitmap;
-        private Bitmap mGrayBackgroundBitmap;
         private Rect mCardBounds = new Rect();
         private boolean mLowBitAmbient;
         private boolean mBurnInProtection;
