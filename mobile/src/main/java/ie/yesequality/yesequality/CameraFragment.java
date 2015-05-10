@@ -41,7 +41,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private int mCameraId;
 
 
-
     /**
      * Determine the current display orientation and rotate the mCamera preview
      * accordingly.
@@ -133,11 +132,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
      */
     public void takePicture() {
         orientationListener.rememberOrientation();
-
-        mCamera.takePicture(null, null, this);
+        if (mCamera != null) {
+            mCamera.takePicture(null, null, this);
+        } else {
+            Toast.makeText(getActivity(), "Unable to take a picture because the camera is not connected. :(", Toast.LENGTH_LONG).show();
+        }
     }
-
-
 
 
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, float left, float top, int parentWidth, int
@@ -175,10 +175,10 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         Canvas canvas = new Canvas(scaledBitmap);
         canvas.setMatrix(scaleMatrix);
-        Paint paint =new Paint(Paint.FILTER_BITMAP_FLAG);
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
         paint.setAntiAlias(true);
         canvas.drawBitmap(bitmap, middleX - bitmap.getWidth() / 2, middleY - bitmap.getHeight() /
-                2,paint );
+                2, paint);
 
         return scaledBitmap;
     }
@@ -306,19 +306,21 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-// Ignored, Camera does all the work for us
+        // Ignored, Camera does all the work for us
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        mCamera.stopPreview();
-        mCamera.release();
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
         return true;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-// Invoked every time there's a new Camera preview frame
+        // Invoked every time there's a new Camera preview frame
     }
 
 
