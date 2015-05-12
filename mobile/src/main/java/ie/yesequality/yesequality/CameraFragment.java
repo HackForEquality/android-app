@@ -135,7 +135,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         if (mCamera != null) {
             mCamera.takePicture(null, null, this);
         } else {
-            Toast.makeText(getActivity(), "Unable to take a picture because the camera is not connected. :(", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Unable to take a picture because the camera is not " +
+                    "connected. :(", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -290,9 +291,11 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         Camera.Parameters params = mCamera.getParameters();
         params.set("orientation", "portrait");
         optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(),
-                getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics
-                        ().heightPixels);
+                width, height);
         params.setPreviewSize(optimalSize.width, optimalSize.height);
+        Camera.Size pictureSize = getOptimalPreviewSize(params.getSupportedPictureSizes(), width,
+                height);
+        params.setPictureSize(pictureSize.width, pictureSize.height);
         mCamera.setParameters(params);
         // start preview with new settings
         try {
