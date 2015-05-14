@@ -1,31 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/photo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:src="@mipmap/ic_launcher"/>
-
-
-        <ImageView
-            android:id="@+id/ivWaterMarkPic"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_alignBottom="@+id/photo"
-            android:src="@drawable/ic_wm_vote_for_me"
-            android:visibility="gone"/>
-
-    </FrameLayout>
-
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:scaleType="fitStart"
+        tools:src="@mipmap/ic_launcher" />
+</FrameLayout>

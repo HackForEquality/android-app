@@ -61,4 +61,5 @@
     <string name="alarmSetDayBefore">Reminder set for day before voting day</string>
     <string name="alarmCancelDay">Reminder cancelled for voting day</string>
     <string name="alarmCancelDayBefore">Reminder cancelled for day before voting day</string>
+    <string name="error_taking_picture">Unable to take a picture because the camera is not connected. :(</string>
 </resources>

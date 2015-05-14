@@ -1,11 +1,17 @@
 package ie.yesequality.yesequality;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Camera;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +25,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -32,15 +40,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import ie.yesequality.yesequality.views.CameraFragmentListener;
+import ie.yesequality.yesequality.utils.BitmapUtils;
 import ie.yesequality.yesequality.views.CameraOverlayView;
 
-public class CameraMainActivityTest extends AppCompatActivity implements CameraFragmentListener {
+public class CameraMainActivityTest extends AppCompatActivity implements TextureView.SurfaceTextureListener,
+        Camera.PictureCallback {
     public static final String TAG = "CameraMainActivity";
     private static final int PICTURE_QUALITY = 100;
     @InjectView(R.id.tbActionBar)
@@ -53,6 +63,12 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
     protected ImageView selfieButton;
     @InjectView(R.id.camera_overlay)
     protected CameraOverlayView cameraOverlayView;
+
+    TextureView previewView;
+    private Camera mCamera;
+
+    private Camera.Size optimalSize;
+    private int mCameraId;
 
 
     private int[] mVoteBadges = new int[]{R.drawable.ic_wm_vote_for_me,
@@ -71,6 +87,45 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
     public static String getPhotoDirectory(Context context) {
         return context.getExternalFilesDir(null).getPath();
+    }
+
+    /**
+     * Determine the current display orientation and rotate the mCamera preview
+     * accordingly.
+     */
+    public static int setCameraDisplayOrientation(Activity activity,
+                                                  int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+
+        return result;
+
     }
 
     @Override
@@ -197,7 +252,146 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
                 .WATERMARK_CLICKED, false)) {
             showCustomToast("Tap the badge!");
         }
+
+        previewView = (TextureView) findViewById(R.id.camera_fragment);
+        previewView.setSurfaceTextureListener(this);
     }
+
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        mCamera = null;
+
+        if (Camera.getNumberOfCameras() == 0) {
+            Toast.makeText(this, getString(R.string.error_unable_to_connect), Toast
+                    .LENGTH_LONG).show();
+            return;
+        }
+
+        mCameraId = 0;
+        //First try to open a front facing camera
+        try {
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+                Camera.getCameraInfo(i, cameraInfo);
+
+                if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+
+                    mCamera = Camera.open(i);
+
+                    mCameraId = i;
+                    break;
+                }
+            }
+        } catch (RuntimeException e) {
+            mCamera = null;
+        }
+
+        //There were no front facing cameras, try to find a rear-facing one
+        if (mCamera == null) {
+            try {
+                mCamera = Camera.open();
+            } catch (RuntimeException e) {
+                mCamera = null;
+            }
+        }
+
+        //Ah well, who really wants a camera anyway?
+        if (mCamera == null) {
+            Toast.makeText(this, getString(R.string.error_unable_to_connect), Toast
+                    .LENGTH_LONG).show();
+            return;
+        }
+
+        mCamera.setDisplayOrientation(setCameraDisplayOrientation(this, mCameraId,
+                mCamera));
+
+        // stop preview before making changes
+        try {
+            mCamera.stopPreview();
+        } catch (Exception e) {
+            // ignore: tried to stop a non-existent preview
+        }
+
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+        Camera.Parameters params = mCamera.getParameters();
+        params.set("orientation", "portrait");
+        optimalSize = getOptimalPreviewSize(params.getSupportedPreviewSizes(),
+                width, height);
+        params.setPreviewSize(optimalSize.width, optimalSize.height);
+
+        int smallSide = optimalSize.height < optimalSize.width ? optimalSize.height : optimalSize.width;
+        int largeSide = optimalSize.height > optimalSize.width ? optimalSize.height : optimalSize.width;
+
+        float scale = (float) rlSurfaceLayout.getWidth() / smallSide;
+        previewView.setLayoutParams(new FrameLayout.LayoutParams(rlSurfaceLayout.getWidth(), (int) (scale * largeSide), Gravity.CENTER));
+
+        Camera.Size pictureSize = getOptimalPreviewSize(params.getSupportedPictureSizes(), width, height);
+        params.setPictureSize(pictureSize.width, pictureSize.height);
+        mCamera.setParameters(params);
+        // start preview with new settings
+        try {
+            mCamera.setPreviewTexture(surface);
+            mCamera.startPreview();
+
+        } catch (Exception e) {
+            Log.d(TAG, "Error starting mCamera preview: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        // Ignored, Camera does all the work for us
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
+        return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        // Invoked every time there's a new Camera preview frame
+    }
+
+
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.05;
+        double targetRatio = (double) w / h;
+
+        if (sizes == null) return null;
+
+        Camera.Size optimalSize = null;
+
+        double minDiff = Double.MAX_VALUE;
+
+        // Find size
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - h) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - h);
+            }
+        }
+
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - h) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - h);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
 
     private void showCustomToast(String message) {
         Toast toast = new Toast(this);
@@ -238,39 +432,29 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
     protected void onResume() {
         super.onResume();
         selfieButton.setEnabled(true);
+
+        if (previewView.getSurfaceTexture() != null && mCamera != null) {
+            mCamera.startPreview();
+        }
     }
 
-
-    /**
-     * On fragment notifying about a non-recoverable problem with the camera.
-     */
-    @Override
-    public void onCameraError() {
-        Toast.makeText(
-                this,
-                "Camera error",
-                Toast.LENGTH_SHORT
-        ).show();
-
-        finish();
-    }
 
     @OnClick(R.id.selfieButton)
     public void takePicture(View view) {
         view.setEnabled(false);
 
-        CameraFragment fragment = (CameraFragment) getSupportFragmentManager().findFragmentById(R
-                .id.camera_fragment);
-
-
-        fragment.takePicture();
+        if (mCamera != null) {
+            mCamera.takePicture(null, null, this);
+        } else {
+            Toast.makeText(this, R.string.error_taking_picture, Toast.LENGTH_LONG).show();
+        }
     }
 
 
     /**
      * A picture has been taken.
      */
-    public void onPictureTaken(Bitmap bitmap) {
+    public void saveAndSharePicture(Bitmap bitmap) {
         File mediaStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES
@@ -311,13 +495,60 @@ public class CameraMainActivityTest extends AppCompatActivity implements CameraF
 
         Intent intent = new Intent(this, PhotoActivity.class);
         intent.setData(Uri.fromFile(mediaFile));
-        startActivity(intent);
 
-//        finish();
+        intent.putExtra(PhotoActivity.ABSOLUTE_Y, (int) rlSurfaceLayout.getY());
+        startActivity(intent);
     }
 
     private void showSavingPictureErrorToast() {
         Toast.makeText(this, "Error saving picture", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Take a picture and notify the listener once the picture is taken.
+     */
+    public void takePicture() {
+        if (mCamera != null) {
+            mCamera.takePicture(null, null, this);
+        } else {
+            Toast.makeText(this, R.string.error_taking_picture, Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    /**
+     * A picture has been taken.
+     */
+    @Override
+    public void onPictureTaken(byte[] data, Camera camera) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+        Matrix matrix = new Matrix();
+        matrix.preScale(1, -1);
+
+        matrix.postRotate((180 + setCameraDisplayOrientation(this, mCameraId,
+                mCamera)) % 360);
+
+        bitmap = Bitmap.createBitmap(
+                bitmap,
+                Math.abs(optimalSize.width - bitmap.getWidth()) / 2,
+                Math.abs(optimalSize.height - bitmap.getHeight()) / 2,
+                optimalSize.width,
+                optimalSize.height,
+                matrix,
+                false
+        );
+
+
+        Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
+
+        bitmap = BitmapUtils.cropBitmapToSquare(bitmap);
+
+        bitmap = BitmapUtils.overlayBitmap(bitmap, waterMark, ivWaterMarkPic.getX(), ivWaterMarkPic.getY(),
+                rlSurfaceLayout.getWidth(), rlSurfaceLayout.getHeight());
+
+
+        saveAndSharePicture(bitmap);
     }
 
 
