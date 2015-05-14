@@ -4,11 +4,11 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <fragment
+    <TextureView
         android:id="@+id/camera_fragment"
-        android:name="ie.yesequality.yesequality.CameraFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 
     <ie.yesequality.yesequality.views.CameraOverlayView
         android:id="@+id/camera_overlay"

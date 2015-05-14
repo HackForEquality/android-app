@@ -1,16 +1,18 @@
 package ie.yesequality.yesequality;
 
-import android.content.ClipData;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
-import android.view.DragEvent;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import butterknife.ButterKnife;
@@ -21,27 +23,29 @@ import butterknife.InjectView;
  *
  * @author Sebastian Kaspari <sebastian@androidzeitgeist.com>
  */
-public class PhotoActivity extends ActionBarActivity {
+public class PhotoActivity extends AppCompatActivity {
     private static final String MIME_TYPE = "image/jpeg";
+    public static String ABSOLUTE_Y = "absolute y";
     @InjectView(R.id.photo)
     protected ImageView photo;
-    @InjectView(R.id.ivWaterMarkPic)
-    protected ImageView ivWaterMarkPic;
     private Uri uri;
-    private int[] mVoteBadges = new int[]{R.drawable.ic_wm_vote_for_me,
-            R.drawable.ic_wm_vote_for_me_color,
-            R.drawable.ic_wm_yes_im_voting,
-            R.drawable.ic_wm_yes_im_voting_color,
-            R.drawable.ic_wm_we_voting,
-            R.drawable.ic_wm_we_voting_color,
-            R.drawable.ic_wm_ta,
-            R.drawable.ic_wm_ta_color,
-            R.drawable.ic_wm_yes,
-            R.drawable.ic_wm_yes_color
-    };
 
-    private int mSelectedBadge = 0;
+    public static int getActionBarHeight(Resources.Theme theme, Resources resources) {
+        TypedValue tv = new TypedValue();
+        if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            return TypedValue.complexToDimensionPixelSize(tv.data, resources.getDisplayMetrics());
+        }
+        return 0;
+    }
 
+    public static int getStatusBarHeight(Resources resources) {
+        int result = 0;
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,39 +54,17 @@ public class PhotoActivity extends ActionBarActivity {
 
         ButterKnife.inject(this);
 
+
         uri = getIntent().getData();
+        int y = getIntent().getIntExtra(ABSOLUTE_Y, -1);
 
-
+        if (y > 0) {
+            photo.setPadding(0, y - getStatusBarHeight(getResources()) - getActionBarHeight(getTheme(), getResources()), 0, 0);
+        } else {
+            photo.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        }
         photo.setImageURI(uri);
 
-        ivWaterMarkPic.setOnDragListener(new BadgeDragListener());
-
-        ivWaterMarkPic.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                v.startDrag(data, shadowBuilder, v, 0);
-                v.setVisibility(View.INVISIBLE);
-                return true;
-            }
-        });
-
-        ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
-        ivWaterMarkPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSelectedBadge >= mVoteBadges.length - 1) {
-                    mSelectedBadge = 0;
-                } else {
-                    mSelectedBadge++;
-                }
-
-                ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
-            }
-        });
-
-        photo.setOnDragListener(new BadgeDragListener());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -109,23 +91,4 @@ public class PhotoActivity extends ActionBarActivity {
     }
 
 
-    private final class BadgeDragListener implements View.OnDragListener {
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            int action = event.getAction();
-            switch (action) {
-                case DragEvent.ACTION_DRAG_STARTED:
-
-                case DragEvent.ACTION_DROP:
-                    View view = (View) event.getLocalState();
-                    view.setX(event.getX() - (view.getWidth() / 2));
-                    view.setY(event.getY() - (view.getHeight() / 2));
-                    view.setVisibility(View.VISIBLE);
-                    break;
-                default:
-                    break;
-            }
-            return true;
-        }
-    }
 }
