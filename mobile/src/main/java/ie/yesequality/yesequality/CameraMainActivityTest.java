@@ -528,16 +528,27 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
 
         matrix.postRotate((180 + setCameraDisplayOrientation(this, mCameraId,
                 mCamera)) % 360);
-
-        bitmap = Bitmap.createBitmap(
-                bitmap,
-                Math.abs(optimalSize.width - bitmap.getWidth()) / 2,
-                Math.abs(optimalSize.height - bitmap.getHeight()) / 2,
-                optimalSize.width,
-                optimalSize.height,
-                matrix,
-                false
-        );
+        if (bitmap.getWidth() >= optimalSize.width && bitmap.getHeight() >= optimalSize.height) {
+            bitmap = Bitmap.createBitmap(
+                    bitmap,
+                    Math.abs(optimalSize.width - bitmap.getWidth()) / 2,
+                    Math.abs(optimalSize.height - bitmap.getHeight()) / 2,
+                    optimalSize.width,
+                    optimalSize.height,
+                    matrix,
+                    false
+            );
+        } else {
+            bitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    0,
+                    bitmap.getWidth(),
+                    bitmap.getHeight(),
+                    matrix,
+                    false
+            );
+        }
 
 
         Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
