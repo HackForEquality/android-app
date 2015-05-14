@@ -2,7 +2,6 @@ package ie.yesequality.yesequality;
 
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,7 +48,8 @@ import butterknife.OnClick;
 import ie.yesequality.yesequality.utils.BitmapUtils;
 import ie.yesequality.yesequality.views.CameraOverlayView;
 
-public class CameraMainActivityTest extends AppCompatActivity implements TextureView.SurfaceTextureListener,
+public class CameraMainActivityTest extends AppCompatActivity implements TextureView
+        .SurfaceTextureListener,
         Camera.PictureCallback {
     public static final String TAG = "CameraMainActivity";
     private static final int PICTURE_QUALITY = 100;
@@ -64,7 +64,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
     @InjectView(R.id.camera_overlay)
     protected CameraOverlayView cameraOverlayView;
 
-    TextureView previewView;
+    TextureView mTextureView;
     private Camera mCamera;
 
     private Camera.Size optimalSize;
@@ -84,10 +84,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
     };
 
     private int mSelectedBadge = 0;
+    private float mPreviewScale;
 
-    public static String getPhotoDirectory(Context context) {
-        return context.getExternalFilesDir(null).getPath();
-    }
 
     /**
      * Determine the current display orientation and rotate the mCamera preview
@@ -253,8 +251,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
             showCustomToast("Tap the badge!");
         }
 
-        previewView = (TextureView) findViewById(R.id.camera_fragment);
-        previewView.setSurfaceTextureListener(this);
+        mTextureView = (TextureView) findViewById(R.id.camera_fragment);
+        mTextureView.setSurfaceTextureListener(this);
     }
 
 
@@ -321,13 +319,17 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
                 width, height);
         params.setPreviewSize(optimalSize.width, optimalSize.height);
 
-        int smallSide = optimalSize.height < optimalSize.width ? optimalSize.height : optimalSize.width;
-        int largeSide = optimalSize.height > optimalSize.width ? optimalSize.height : optimalSize.width;
+        int smallSide = optimalSize.height < optimalSize.width ? optimalSize.height : optimalSize
+                .width;
+        int largeSide = optimalSize.height > optimalSize.width ? optimalSize.height : optimalSize
+                .width;
 
-        float scale = (float) rlSurfaceLayout.getWidth() / smallSide;
-        previewView.setLayoutParams(new FrameLayout.LayoutParams(rlSurfaceLayout.getWidth(), (int) (scale * largeSide), Gravity.CENTER));
+        mPreviewScale = (float) rlSurfaceLayout.getWidth() / smallSide;
+        mTextureView.setLayoutParams(new FrameLayout.LayoutParams(rlSurfaceLayout.getWidth(),
+                (int) (mPreviewScale * largeSide), Gravity.CENTER));
 
-        Camera.Size pictureSize = getOptimalPreviewSize(params.getSupportedPictureSizes(), width, height);
+        Camera.Size pictureSize = getOptimalPreviewSize(params.getSupportedPictureSizes(), width,
+                height);
         params.setPictureSize(pictureSize.width, pictureSize.height);
         mCamera.setParameters(params);
         // start preview with new settings
@@ -433,7 +435,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
         super.onResume();
         selfieButton.setEnabled(true);
 
-        if (previewView.getSurfaceTexture() != null && mCamera != null) {
+        if (mTextureView.getSurfaceTexture() != null && mCamera != null) {
             mCamera.startPreview();
         }
     }
@@ -505,18 +507,6 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
     }
 
     /**
-     * Take a picture and notify the listener once the picture is taken.
-     */
-    public void takePicture() {
-        if (mCamera != null) {
-            mCamera.takePicture(null, null, this);
-        } else {
-            Toast.makeText(this, R.string.error_taking_picture, Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    /**
      * A picture has been taken.
      */
     @Override
@@ -528,13 +518,27 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
 
         matrix.postRotate((180 + setCameraDisplayOrientation(this, mCameraId,
                 mCamera)) % 360);
-        if (bitmap.getWidth() >= optimalSize.width && bitmap.getHeight() >= optimalSize.height) {
+        int largeSide = bitmap.getWidth() > bitmap.getHeight() ? bitmap.getWidth() : bitmap
+                .getHeight();
+        int smallSide = bitmap.getWidth() < bitmap.getHeight() ? bitmap.getWidth() : bitmap
+                .getHeight();
+
+        int largePreviewSide = optimalSize.width > optimalSize.height ? optimalSize.width :
+                optimalSize.height;
+        int smallPreviewSide = optimalSize.width < optimalSize.height ? optimalSize.width :
+                optimalSize.height;
+
+        Log.d(this.getClass().getSimpleName(), "Scale: " + mPreviewScale + "\n- large: " +
+                largeSide + ":" + largePreviewSide + "\n- small: " + smallSide + ":" +
+                smallPreviewSide);
+
+        if (mPreviewScale <= 1 && largeSide >= largePreviewSide && smallSide >= smallPreviewSide) {
             bitmap = Bitmap.createBitmap(
                     bitmap,
-                    Math.abs(optimalSize.width - bitmap.getWidth()) / 2,
-                    Math.abs(optimalSize.height - bitmap.getHeight()) / 2,
-                    optimalSize.width,
-                    optimalSize.height,
+                    Math.abs(largeSide - largePreviewSide) / 2,
+                    Math.abs(smallSide - smallPreviewSide) / 2,
+                    largePreviewSide,
+                    smallPreviewSide,
                     matrix,
                     false
             );
@@ -555,7 +559,8 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
 
         bitmap = BitmapUtils.cropBitmapToSquare(bitmap);
 
-        bitmap = BitmapUtils.overlayBitmap(bitmap, waterMark, ivWaterMarkPic.getX(), ivWaterMarkPic.getY(),
+        bitmap = BitmapUtils.overlayBitmap(bitmap, waterMark, ivWaterMarkPic.getX(),
+                ivWaterMarkPic.getY(),
                 rlSurfaceLayout.getWidth(), rlSurfaceLayout.getHeight());
 
 
