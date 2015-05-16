@@ -41,7 +41,7 @@
 
 
         <activity
-            android:name=".CameraMainActivityTest"
+            android:name=".CameraActivity"
             android:label="@string/title_activity_camera_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Camera">
@@ -50,32 +50,32 @@
         <activity
             android:name=".PhotoActivity"
             android:label="Share Photo"
-            android:parentActivityName=".CameraMainActivityTest"
+            android:parentActivityName=".CameraActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CameraMainActivityTest"/>
+                android:value=".CameraActivity" />
         </activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:parentActivityName=".CameraMainActivityTest"
+            android:parentActivityName=".CameraActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeDarkAction">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CameraMainActivityTest"/>
+                android:value=".CameraActivity" />
         </activity>
 
         <activity
             android:name=".NotificationActivity"
             android:label="@string/title_activity_notification"
-            android:parentActivityName=".CameraMainActivityTest"
+            android:parentActivityName=".CameraActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeDarkAction">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CameraMainActivityTest"/>
+                android:value=".CameraActivity" />
         </activity>
 
         <receiver

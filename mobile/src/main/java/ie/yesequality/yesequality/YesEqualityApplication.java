@@ -14,6 +14,7 @@ import java.util.TimeZone;
  */
 public class YesEqualityApplication extends Application {
     private static final String VOTE_START = "2015-05-22T06:55:00";
+    //private static final String VOTE_START = "2015-05-17T00:08:00";
 
     private static final String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final String DUBLIN_TIMEZONE_NAME = "Europe/Dublin";

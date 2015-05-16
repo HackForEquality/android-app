@@ -33,8 +33,8 @@ public class SplashScreen extends Activity {
             @Override
             public void run() {
                 // This method will be executed once the timer is over
-                // Start your app main activity
-                Intent i = new Intent(SplashScreen.this, CameraMainActivityTest.class);
+                // Start the Camera Activity
+                Intent i = new Intent(SplashScreen.this, CameraActivity.class);
                 startActivity(i);
 
                 // close this activity

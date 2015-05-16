@@ -48,30 +48,17 @@ import butterknife.OnClick;
 import ie.yesequality.yesequality.utils.BitmapUtils;
 import ie.yesequality.yesequality.views.CameraOverlayView;
 
-public class CameraMainActivityTest extends AppCompatActivity implements TextureView
+public class CameraActivity extends AppCompatActivity implements TextureView
         .SurfaceTextureListener,
         Camera.PictureCallback {
-    public static final String TAG = "CameraMainActivity";
     private static final int PICTURE_QUALITY = 100;
-    @InjectView(R.id.tbActionBar)
-    protected Toolbar tbActionBar;
-    @InjectView(R.id.rlSurfaceLayout)
-    protected RelativeLayout rlSurfaceLayout;
-    @InjectView(R.id.ivWaterMarkPic)
-    protected ImageView ivWaterMarkPic;
-    @InjectView(R.id.selfieButton)
-    protected ImageView selfieButton;
-    @InjectView(R.id.camera_overlay)
-    protected CameraOverlayView cameraOverlayView;
-
-    TextureView mTextureView;
-    private Camera mCamera;
-
-    private Camera.Size optimalSize;
-    private int mCameraId;
-
-
-    private int[] mVoteBadges = new int[]{R.drawable.ic_wm_vote_for_me,
+    private static final int[] AllVoteBadges = new int[]{R.drawable.ic_wm_i_voted,
+            R.drawable.ic_wm_i_voted_color,
+            R.drawable.ic_wm_its_yes,
+            R.drawable.ic_wm_its_yes_color,
+            R.drawable.ic_wm_thank_you,
+            R.drawable.ic_wm_thank_you_color,
+            R.drawable.ic_wm_vote_for_me,
             R.drawable.ic_wm_vote_for_me_color,
             R.drawable.ic_wm_yes_im_voting,
             R.drawable.ic_wm_yes_im_voting_color,
@@ -82,7 +69,31 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
             R.drawable.ic_wm_yes,
             R.drawable.ic_wm_yes_color
     };
-
+    private static int[] sVoteBadges = new int[]{R.drawable.ic_wm_vote_for_me,
+            R.drawable.ic_wm_vote_for_me_color,
+            R.drawable.ic_wm_yes_im_voting,
+            R.drawable.ic_wm_yes_im_voting_color,
+            R.drawable.ic_wm_we_voting,
+            R.drawable.ic_wm_we_voting_color,
+            R.drawable.ic_wm_ta,
+            R.drawable.ic_wm_ta_color,
+            R.drawable.ic_wm_yes,
+            R.drawable.ic_wm_yes_color
+    };
+    @InjectView(R.id.tbActionBar)
+    protected Toolbar tbActionBar;
+    @InjectView(R.id.rlSurfaceLayout)
+    protected RelativeLayout rlSurfaceLayout;
+    @InjectView(R.id.ivWaterMarkPic)
+    protected ImageView ivWaterMarkPic;
+    @InjectView(R.id.selfieButton)
+    protected ImageView selfieButton;
+    @InjectView(R.id.camera_overlay)
+    protected CameraOverlayView cameraOverlayView;
+    TextureView mTextureView;
+    private Camera mCamera;
+    private Camera.Size optimalSize;
+    private int mCameraId;
     private int mSelectedBadge = 0;
     private float mPreviewScale;
 
@@ -143,18 +154,22 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
         setContentView(R.layout.surface_camera_layout_test);
         ButterKnife.inject(this);
 
+        if (((YesEqualityApplication) getApplication()).isVotingStarted()) {
+            sVoteBadges = AllVoteBadges;
+        }
+
         tbActionBar.setTitle(R.string.app_name);
         tbActionBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_info:
-                        Intent infoIntent = new Intent(CameraMainActivityTest.this, MainActivity
+                        Intent infoIntent = new Intent(CameraActivity.this, MainActivity
                                 .class);
                         startActivity(infoIntent);
                         return true;
                     case R.id.action_reminders:
-                        Intent reminderIntent = new Intent(CameraMainActivityTest.this,
+                        Intent reminderIntent = new Intent(CameraActivity.this,
                                 NotificationActivity.class);
                         startActivity(reminderIntent);
                         return true;
@@ -203,19 +218,19 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
         });
 
 
-        ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
+        ivWaterMarkPic.setImageResource(sVoteBadges[mSelectedBadge]);
         ivWaterMarkPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit().putBoolean
                         (Constants.WATERMARK_CLICKED, true).apply();
-                if (mSelectedBadge >= mVoteBadges.length - 1) {
+                if (mSelectedBadge >= sVoteBadges.length - 1) {
                     mSelectedBadge = 0;
                 } else {
                     mSelectedBadge++;
                 }
 
-                ivWaterMarkPic.setImageResource(mVoteBadges[mSelectedBadge]);
+                ivWaterMarkPic.setImageResource(sVoteBadges[mSelectedBadge]);
                 ivWaterMarkPic.setVisibility(View.VISIBLE);
                 ivWaterMarkPic.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
@@ -338,7 +353,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
             mCamera.startPreview();
 
         } catch (Exception e) {
-            Log.d(TAG, "Error starting mCamera preview: " + e.getMessage());
+            Log.d(this.getClass().getSimpleName(), "Error starting mCamera preview: " + e.getMessage());
         }
     }
 
@@ -415,18 +430,14 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
             ivWaterMarkPic.setX(0);
         } else if (rlSurfaceLayout.getWidth() - internalX < ivWaterMarkPic.getWidth() / 2) {
             ivWaterMarkPic.setX(rlSurfaceLayout.getWidth() - ivWaterMarkPic.getWidth());
-        } /*else {
-            ivWaterMarkPic.setX(internalX - (ivWaterMarkPic.getWidth() / 2));
-        }*/
+        }
 
 
         if (internalY < ivWaterMarkPic.getHeight() / 2) {
             ivWaterMarkPic.setY(0);
         } else if (rlSurfaceLayout.getHeight() - internalY < ivWaterMarkPic.getHeight() / 2) {
             ivWaterMarkPic.setY(rlSurfaceLayout.getHeight() - ivWaterMarkPic.getHeight());
-        } /*else {
-            ivWaterMarkPic.setY(internalY - (ivWaterMarkPic.getHeight() / 2));
-        }*/
+        }
     }
 
 
@@ -483,7 +494,7 @@ public class CameraMainActivityTest extends AppCompatActivity implements Texture
         } catch (IOException exception) {
             showSavingPictureErrorToast();
 
-            Log.w(TAG, "IOException during saving bitmap", exception);
+            Log.w(this.getClass().getSimpleName(), "IOException during saving bitmap", exception);
             return;
         }
 

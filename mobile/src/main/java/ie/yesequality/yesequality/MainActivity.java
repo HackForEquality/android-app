@@ -4,7 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.viewpagerindicator.CirclePageIndicator;
@@ -15,7 +15,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class MainActivity extends ActionBarActivity implements PageAdapter.PagerListener {
+public class MainActivity extends AppCompatActivity implements PageAdapter.PagerListener {
 
     @InjectView(R.id.indicator)
     protected CirclePageIndicator indicator;
@@ -58,7 +58,6 @@ public class MainActivity extends ActionBarActivity implements PageAdapter.Pager
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.lilac)));
     }
-
 
 
     private List<Fragment> getFragmentList() {
