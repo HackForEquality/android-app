@@ -111,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements PageAdapter.Pager
 
         int colorId = R.color.green;
         if (position < getFragmentList().size()) {
-            colorId = getFragmentList().get(position).getArguments().getInt("COLOR_ID");
+            if (R.color.white != getFragmentList().get(position).getArguments().getInt("COLOR_ID")) {
+                colorId = getFragmentList().get(position).getArguments().getInt("COLOR_ID");
+            }
         }
         ColorDrawable colorDrawable = new ColorDrawable(getResources().getColor(colorId));
 
