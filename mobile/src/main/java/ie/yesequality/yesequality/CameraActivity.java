@@ -566,6 +566,10 @@ public class CameraActivity extends AppCompatActivity implements TextureView
         }
 
 
+        if (sVoteBadges[mSelectedBadge] == R.drawable.ic_wm_i_voted || sVoteBadges[mSelectedBadge] == R.drawable.ic_wm_i_voted_color) {
+            getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).edit().putBoolean(Constants.HAS_VOTED, true).apply();
+        }
+
         Bitmap waterMark = ((BitmapDrawable) ivWaterMarkPic.getDrawable()).getBitmap();
 
         bitmap = BitmapUtils.cropBitmapToSquare(bitmap);

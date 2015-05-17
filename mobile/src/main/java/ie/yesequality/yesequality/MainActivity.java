@@ -61,7 +61,14 @@ public class MainActivity extends AppCompatActivity implements PageAdapter.Pager
 
 
     private List<Fragment> getFragmentList() {
-        List<Fragment> fragments = new ArrayList<Fragment>();
+        List<Fragment> fragments = new ArrayList<>();
+        if (((YesEqualityApplication) getApplication()).isVotingStarted() &&
+                getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE).getBoolean(Constants.HAS_VOTED, false)) {
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon12,
+                    R.string.information_page_thank_you_top, R.string.information_page_thank_you_bottom,
+                    R.color.dark_green, "", R.color.white));
+        }
+
         fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon1,
                 R.string.information_page_string_two, R.string.information_page_string_three,
                 R.color.lilac, "", R.color.white));
@@ -86,6 +93,12 @@ public class MainActivity extends AppCompatActivity implements PageAdapter.Pager
                 R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
                 R.color.green, "", R.color.white));
 
+        if (((YesEqualityApplication) getApplication()).isVotingStarted()) {
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon13,
+                    R.string.information_page_github_top, R.string.information_page_github_bottom,
+                    R.color.github_grey, "https://github.com/HackForEquality/android-app", R.color.white));
+        }
+
         fragments.add(InformationPagesFragment.newInstance(R.drawable.ic_wm_yes_color,
                 R.string.information_page_string_seventeen, R.string.information_page_string_eighteen,
                 R.color.white, "http://www.yesequality.ie", R.color.black));
@@ -95,30 +108,13 @@ public class MainActivity extends AppCompatActivity implements PageAdapter.Pager
 
     @Override
     public void getPosition(int position) {
-        ColorDrawable colorDrawable;
-        switch (position) {
-            case 0:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.lilac));
-                break;
-            case 1:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_cyan));
-                break;
-            case 2:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.navy));
-                break;
-            case 3:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_lilac));
-                break;
-            case 4:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.dark_navy));
-                break;
-            case 5:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
-                break;
-            default:
-                colorDrawable = new ColorDrawable(getResources().getColor(R.color.green));
-                break;
+
+        int colorId = R.color.green;
+        if (position < getFragmentList().size()) {
+            colorId = getFragmentList().get(position).getArguments().getInt("COLOR_ID");
         }
+        ColorDrawable colorDrawable = new ColorDrawable(getResources().getColor(colorId));
+
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
     }

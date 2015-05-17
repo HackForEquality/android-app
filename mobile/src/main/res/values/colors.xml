@@ -18,4 +18,5 @@
     <color name="dark_red">#bd202e</color>
 
     <color name="grey">#cccccc</color>
+    <color name="github_grey">#171515</color>
 </resources>
