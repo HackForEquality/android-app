@@ -67,4 +67,23 @@
     <string name="alarmCancelDay">Reminder cancelled for voting day</string>
     <string name="alarmCancelDayBefore">Reminder cancelled for day before voting day</string>
     <string name="error_taking_picture">Unable to take a picture because the camera is not connected. :(</string>
+
+    <string name="contributor_text">This application was built through the volunteer effort of:</string>
+    <string-array name="contributors_list">
+        <item>Alan Cowap</item>
+        <item>Chris Clancy</item>
+        <item>Colm Doyle</item>
+        <item>Dean Harrison</item>
+        <item>Fergal Carroll</item>
+        <item>Jacqueline Russell</item>
+        <item>Jessy Conroy</item>
+        <item>Jose Dominguez</item>
+        <item>Laura Uzcategui</item>
+        <item>Rayco Batista Diaz</item>
+        <item>Ricardo La Rosa</item>
+        <item>Rory Glynn</item>
+        <item>Sona Harrison</item>
+        <item>Vlado Atanasov</item>
+        <item>Yunjun Wang</item>
+    </string-array>
 </resources>

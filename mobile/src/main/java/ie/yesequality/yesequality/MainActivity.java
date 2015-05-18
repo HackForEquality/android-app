@@ -69,31 +69,34 @@ public class MainActivity extends AppCompatActivity implements PageAdapter.Pager
                     R.color.dark_green, "", R.color.white));
         }
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon1,
-                R.string.information_page_string_two, R.string.information_page_string_three,
-                R.color.lilac, "", R.color.white));
+        if (!((YesEqualityApplication) getApplication()).isVotingEnded()) {
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon1,
+                    R.string.information_page_string_two, R.string.information_page_string_three,
+                    R.color.lilac, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon2,
-                R.string.information_page_string_two, R.string.information_page_string_four,
-                R.color.dark_cyan, "", R.color.white));
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon2,
+                    R.string.information_page_string_two, R.string.information_page_string_four,
+                    R.color.dark_cyan, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon3,
-                R.string.information_page_string_two, R.string.information_page_string_five,
-                R.color.navy, "", R.color.white));
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon3,
+                    R.string.information_page_string_two, R.string.information_page_string_five,
+                    R.color.navy, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon4,
-                R.string.information_page_string_two, R.string.information_page_string_six,
-                R.color.dark_lilac, "", R.color.white));
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon4,
+                    R.string.information_page_string_two, R.string.information_page_string_six,
+                    R.color.dark_lilac, "", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon5,
-                R.string.information_page_string_seven, R.string.information_page_string_eight,
-                R.color.dark_navy, "http://www.checktheregister.ie", R.color.white));
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon5,
+                    R.string.information_page_string_seven, R.string.information_page_string_eight,
+                    R.color.dark_navy, "http://www.checktheregister.ie", R.color.white));
 
-        fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon9,
-                R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
-                R.color.green, "", R.color.white));
+            fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon9,
+                    R.string.information_page_string_thirteen, R.string.information_page_string_fourteen,
+                    R.color.green, "", R.color.white));
+        }
 
         if (((YesEqualityApplication) getApplication()).isVotingStarted()) {
+            fragments.add(ContributorsFragment.newInstance(R.string.contributor_text, R.color.dark_red, R.color.white, R.array.contributors_list));
             fragments.add(InformationPagesFragment.newInstance(R.drawable.infoicon13,
                     R.string.information_page_github_top, R.string.information_page_github_bottom,
                     R.color.github_grey, "https://github.com/HackForEquality/android-app", R.color.white));

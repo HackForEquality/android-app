@@ -18,17 +18,17 @@ public class InformationPagesFragment extends Fragment {
 
     public static final InformationPagesFragment newInstance(int pictureID, int aboveTextID,
                                                              int belowTextID, int colorID,
-                                                             String link, int textColor) {
+                                                             String link, int textColorID) {
 
         InformationPagesFragment fragment = new InformationPagesFragment();
 
-        Bundle bundle = new Bundle(4);
+        Bundle bundle = new Bundle(6);
         bundle.putInt("PICTURE_ID", pictureID);
         bundle.putInt("BELOW_TEXT", belowTextID);
         bundle.putInt("ABOVE_TEXT", aboveTextID);
         bundle.putInt("COLOR_ID", colorID);
         bundle.putString("LINK", link);
-        bundle.putInt("TEXT_COLOR", textColor);
+        bundle.putInt("TEXT_COLOR_ID", textColorID);
 
         fragment.setArguments(bundle);
 
@@ -52,8 +52,8 @@ public class InformationPagesFragment extends Fragment {
 
         aboveTextView.setText(aboveText);
         belowTextView.setText(belowText);
-        aboveTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR")));
-        belowTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR")));
+        aboveTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR_ID")));
+        belowTextView.setTextColor(getResources().getColor(getArguments().getInt("TEXT_COLOR_ID")));
 
         imageView.setImageResource(imageID);
         final String link = getArguments().getString("LINK", "");
