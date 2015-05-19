@@ -6,6 +6,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -26,7 +27,7 @@ public class YesEqualityApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SimpleDateFormat isoFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat isoFormat = new SimpleDateFormat(TIME_FORMAT, Locale.ENGLISH);
         TimeZone timeZone = TimeZone.getTimeZone(DUBLIN_TIMEZONE_NAME);
         isoFormat.setTimeZone(timeZone);
         Log.d(this.getClass().getSimpleName(), sVoteStartDate.toLocaleString());
