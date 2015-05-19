@@ -6,4 +6,5 @@ package ie.yesequality.yesequality;
 public interface Constants {
     String PREFS_NAME = "ie.yesequality.preferences";
     String WATERMARK_CLICKED = "watermark clicked";
+    String HAS_VOTED = "has voted";
 }

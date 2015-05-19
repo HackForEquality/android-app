@@ -8,11 +8,10 @@ import android.view.Window;
 import android.view.WindowManager;
 
 
-
 public class SplashScreen extends Activity {
 
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 2000;
+    private static final int SPLASH_TIME_OUT = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +33,15 @@ public class SplashScreen extends Activity {
             @Override
             public void run() {
                 // This method will be executed once the timer is over
-                // Start your app main activity
-                Intent i = new Intent(SplashScreen.this, CameraMainActivityTest.class);
+                // Start the Camera Activity
+                Intent i = new Intent(SplashScreen.this, CameraActivity.class);
                 startActivity(i);
 
                 // close this activity
                 finish();
             }
         }, SPLASH_TIME_OUT);
+
     }
 
 }

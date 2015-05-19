@@ -8,8 +8,8 @@ android {
         applicationId "ie.yesequality.yesequality"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 4
-        versionName "1.0.1"
+        versionCode 5
+        versionName "1.0.5"
     }
 
     Properties props = new Properties()

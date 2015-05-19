@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Yes Equality</string>
+    <string name="empty" />
 
     <string name="title_activity_camera_main">Yes Equality</string>
     <string name="title_activity_main">Information</string>
@@ -44,6 +45,10 @@
     <string name="information_page_string_sixteen">You can vote by post too!</string>
     <string name="information_page_string_seventeen">And remember…</string>
     <string name="information_page_string_eighteen">Your vote counts. Don\'t forget to use it</string>
+    <string name="information_page_thank_you_top">You Voted</string>
+    <string name="information_page_thank_you_bottom">Thank You!</string>
+    <string name="information_page_github_top">This application is open source</string>
+    <string name="information_page_github_bottom">Check it out on GitHub</string>
     <string name="closeInfoScreen">X</string>
     <string name="title_activity_notification">Dont Forget!</string>
     <string name="notificationDayBefore">Remind me the day before</string>
@@ -62,4 +67,23 @@
     <string name="alarmCancelDay">Reminder cancelled for voting day</string>
     <string name="alarmCancelDayBefore">Reminder cancelled for day before voting day</string>
     <string name="error_taking_picture">Unable to take a picture because the camera is not connected. :(</string>
+
+    <string name="contributor_text">This application was built through the volunteer effort of:</string>
+    <string-array name="contributors_list">
+        <item>Alan Cowap</item>
+        <item>Chris Clancy</item>
+        <item>Colm Doyle</item>
+        <item>Dean Harrison</item>
+        <item>Fergal Carroll</item>
+        <item>Jacqueline Russell</item>
+        <item>Jessy Conroy</item>
+        <item>Jose Dominguez</item>
+        <item>Laura Uzcategui</item>
+        <item>Rayco Batista Diaz</item>
+        <item>Ricardo La Rosa</item>
+        <item>Rory Glynn</item>
+        <item>Sona Harrison</item>
+        <item>Vlado Atanasov</item>
+        <item>Yunjun Wang</item>
+    </string-array>
 </resources>
