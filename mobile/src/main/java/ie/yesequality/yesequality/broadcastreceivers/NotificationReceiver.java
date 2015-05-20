@@ -24,8 +24,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         boolean onDay = intent.getBooleanExtra(ON_DAY, true);
 
         CharSequence title = "YES EQUALITY";
-        CharSequence text = "Don't forget to vote!";
-        if (onDay) {
+        CharSequence text = "Remember to vote YES";
+        if (!onDay) {
             text = "Remind your friends to vote YES tomorrow!";
         }
 
