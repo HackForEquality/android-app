@@ -107,7 +107,7 @@ public class NotificationActivity extends ActionBarActivity {
 
         Calendar dayBeforeVotingDay = Calendar.getInstance();
         dayBeforeVotingDay.set(Calendar.YEAR, 2015);
-        dayBeforeVotingDay.set(Calendar.MONTH, 4);
+        dayBeforeVotingDay.set(Calendar.MONTH, Calendar.MAY);
         dayBeforeVotingDay.set(Calendar.DAY_OF_MONTH, 21);
         dayBeforeVotingDay.set(Calendar.HOUR_OF_DAY, 10);
         dayBeforeVotingDay.set(Calendar.MINUTE, 30);
