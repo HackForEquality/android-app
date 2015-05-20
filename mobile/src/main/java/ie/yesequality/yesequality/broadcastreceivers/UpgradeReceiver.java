@@ -10,24 +10,23 @@ import android.util.Log;
 
 import java.util.Calendar;
 
-public class BootReceiver extends BroadcastReceiver {
-
+public class UpgradeReceiver extends BroadcastReceiver {
     public static final String ON_DAY = "on_day";
     public static final String ON_DAY_BEFORE = "on_day_before";
     public static final int ALARM_ID_ON_DAY = 220315;
     public static final int ALARM_ID_ON_DAY_BEFORE = 210315;
     private static final String PREFS = "REMINDERS";
 
-    public BootReceiver() {
+
+    public UpgradeReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+        if (intent.getAction().equals("android.intent.action.MY_PACKAGE_REPLACED")) {
             registerAlarm(context);
         }
     }
-
     private void registerAlarm(Context context) {
 
         final SharedPreferences notificationPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -46,19 +45,23 @@ public class BootReceiver extends BroadcastReceiver {
         dayBeforeVotingDay.set(Calendar.MINUTE, 30);
         dayBeforeVotingDay.set(Calendar.SECOND, 0);
 
+
         if (onDayBefore) {
             // Register alarm for day before voting day
             PendingIntent alarmIntentOnDayBefore = PendingIntent.getBroadcast(context, ALARM_ID_ON_DAY_BEFORE, intent, 0);
             alarmManagerOnDayBefore.set(AlarmManager.RTC_WAKEUP, dayBeforeVotingDay.getTimeInMillis(), alarmIntentOnDayBefore);
-            Log.i("BOOTRECEIVER", "Setting up Alarm for day before voting day on: " + dayBeforeVotingDay.getTime());
+            Log.i("UPGRADERECEIVER", "Setting up Alarm for day before voting day on: " + dayBeforeVotingDay.getTime());
         }
+
         if (onDay){
             // Register alarm for voting day (before day + 1)
             dayBeforeVotingDay.add(Calendar.DATE, 1);
             PendingIntent alarmIntentOnDay = PendingIntent.getBroadcast(context, ALARM_ID_ON_DAY, intent, 0);
             alarmManagerOnDay.set(AlarmManager.RTC_WAKEUP, dayBeforeVotingDay.getTimeInMillis(), alarmIntentOnDay);
-            Log.i("BOOTRECEIVER", "Setting up Alarm for voting day on: " + dayBeforeVotingDay.getTime());
+            Log.i("UPGRADERECEIVER", "Setting up Alarm for voting day on: " + dayBeforeVotingDay.getTime());
         }
 
     }
+
+
 }
