@@ -80,6 +80,7 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
         };
         boolean mIsRound;
         int mChinSize;
+
         private boolean mRegisteredTimeZoneReceiver = false;
         private Time mTime;
         private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -110,26 +111,38 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
         private Bitmap mDarkForegroundBitmap;
         private Bitmap foregroundBitmap;
         private Bitmap darkForegroundBitmap;
+        private int mAnimateHeight = 0;
+        private int mAnimateTargetHeight = 0;
+        private boolean mIsAnimating = false;
 
         private void scaleForegroundBitmaps() {
             int foregroundHeight, foregroundWidth;
-            if (mCardBounds.height() > mHeight / 4) {
-                foregroundHeight = (int) (mHeight - (mCardBounds.height() * 1.5));
-                foregroundWidth = mWidth - (mWidth / 4);
-            } else {
-                foregroundHeight = mHeight - (mHeight / 4);
-                foregroundWidth = mWidth - (mWidth / 4);
+
+            if (mIsAnimating) {
+                if (mCardBounds.height() > 0) {
+                    mAnimateHeight += 2;
+                } else {
+                    mAnimateHeight -= 2;
+                }
             }
 
-            float foregroundHeightScale = ((float) foregroundHeight) / ((float) foregroundBitmap.getHeight());
-            float foregroundWidthScale = ((float) foregroundWidth) / ((float) foregroundBitmap.getWidth());
-            float foregroundScale = foregroundHeightScale < foregroundWidthScale ? foregroundHeightScale : foregroundWidthScale;
+            foregroundHeight = mHeight - (mAnimateHeight);
+            foregroundWidth = mWidth - (mWidth / 4);
+
+            float foregroundHeightScale = ((float) foregroundHeight) / ((float) foregroundBitmap
+                    .getHeight());
+            float foregroundWidthScale = ((float) foregroundWidth) / ((float) foregroundBitmap
+                    .getWidth());
+            float foregroundScale = foregroundHeightScale < foregroundWidthScale ?
+                    foregroundHeightScale : foregroundWidthScale;
 
             float foregroundScaledHeight = foregroundScale * foregroundBitmap.getHeight();
             float foregroundScaledWidth = foregroundScale * foregroundBitmap.getWidth();
 
-            mForegroundBitmap = Bitmap.createScaledBitmap(foregroundBitmap, (int) foregroundScaledWidth, (int) foregroundScaledHeight, true);
-            mDarkForegroundBitmap = Bitmap.createScaledBitmap(darkForegroundBitmap, (int) foregroundScaledWidth, (int) foregroundScaledHeight, true);
+            mForegroundBitmap = Bitmap.createScaledBitmap(foregroundBitmap, (int)
+                    foregroundScaledWidth, (int) foregroundScaledHeight, true);
+            mDarkForegroundBitmap = Bitmap.createScaledBitmap(darkForegroundBitmap, (int)
+                    foregroundScaledWidth, (int) foregroundScaledHeight, true);
         }
 
         @Override
@@ -142,16 +155,21 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .setStatusBarGravity(Gravity.START | Gravity.TOP)
                     .setHotwordIndicatorGravity(Gravity.END | Gravity.TOP)
-                    .setViewProtection(WatchFaceStyle.PROTECT_STATUS_BAR | WatchFaceStyle.PROTECT_HOTWORD_INDICATOR)
+                    .setViewProtection(WatchFaceStyle.PROTECT_STATUS_BAR | WatchFaceStyle
+                            .PROTECT_HOTWORD_INDICATOR)
                     .build());
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(Color.BLACK);
-            mBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background_analog_white);
-            mDarkBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.background_analog_black);
+            mBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                    .background_analog_white);
+            mDarkBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                    .background_analog_black);
 
-            foregroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.foreground_analog_white);
-            darkForegroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.foreground_analog_black);
+            foregroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                    .foreground_analog_white);
+            darkForegroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable
+                    .foreground_analog_black);
 
             mMinuteHandPaint = new Paint();
             mMinuteHandPaint.setColor(getResources().getColor(R.color.red));
@@ -187,10 +205,8 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
-            if (mAmbient != inAmbientMode) {
-                mAmbient = inAmbientMode;
-                invalidate();
-            }
+            mAmbient = inAmbientMode;
+
 
             if (mAmbient) {
                 mMinuteHandPaint.setAntiAlias(false);
@@ -199,6 +215,12 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
                 mMinuteHandPaint.setColor(getResources().getColor(android.R.color.white));
                 mHourHandPaint.setColor(getResources().getColor(android.R.color.white));
                 mSecondHandPaint.setColor(getResources().getColor(android.R.color.white));
+
+                if (mCardBounds.height() > 0) {
+                    mAnimateHeight = mAnimateTargetHeight - 2;
+                } else {
+                    mAnimateHeight = (mHeight / 4) + 2;
+                }
             } else {
                 mHourHandPaint.setAntiAlias(true);
                 mMinuteHandPaint.setAntiAlias(true);
@@ -213,6 +235,8 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
              * whether we're in ambient mode), so we may need to start or stop the timer.
              */
             updateTimer();
+
+            invalidate();
         }
 
         @Override
@@ -220,6 +244,7 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
             super.onSurfaceChanged(holder, format, width, height);
             mWidth = width;
             mHeight = height;
+            mAnimateHeight = mHeight / 4;
             /*
              * Find the coordinates of the center point on the preview_analog.
              * Ignore the window insets so that, on round watches
@@ -258,34 +283,35 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
             super.onApplyWindowInsets(insets);
             mIsRound = insets.isRound();
             mChinSize = insets.getSystemWindowInsetBottom();
-
-//            if (mIsRound) {
-//                float scaledWidth = mWidth - (2 * mChinSize);
-//                float scaledHeight = mHeight - (2 * mChinSize);
-//
-//                mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,
-//                        (int) (scaledWidth),
-//                        (int) (scaledWidth), true);
-//                mDarkBackgroundBitmap = Bitmap.createScaledBitmap(mDarkBackgroundBitmap,
-//                        (int) (scaledWidth),
-//                        (int) (scaledWidth), true);
-//            }
         }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             mTime.setToNow();
 
+            if (mCardBounds.height() > 0) {
+                if (mAnimateHeight != mAnimateTargetHeight) {
+                    scaleForegroundBitmaps();
+                }
+            } else if (mAnimateHeight != mHeight / 4) {
+                scaleForegroundBitmaps();
+            }
 
             if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
                 canvas.drawColor(Color.BLACK);
             } else if (mAmbient) {
                 canvas.drawBitmap(mDarkBackgroundBitmap, 0, 0, mBackgroundPaint);
-                canvas.drawBitmap(mDarkForegroundBitmap, (mWidth - mDarkForegroundBitmap.getWidth()) / 2, (mHeight - mCardBounds.height() - mDarkForegroundBitmap.getHeight()) / 2, mBackgroundPaint);
+                canvas.drawBitmap(mDarkForegroundBitmap, (mWidth - mDarkForegroundBitmap.getWidth
+                                ()) / 2,
+                        (mHeight - (mAnimateHeight - mHeight / 4) - mDarkForegroundBitmap
+                                .getHeight()) / 2, mBackgroundPaint);
                 canvas.drawRect(mCardBounds, mBackgroundPaint);
+
+
             } else {
                 canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
-                canvas.drawBitmap(mForegroundBitmap, (mWidth - mForegroundBitmap.getWidth()) / 2, (mHeight - mCardBounds.height() - mForegroundBitmap.getHeight()) / 2, mBackgroundPaint);
+                canvas.drawBitmap(mForegroundBitmap, (mWidth - mForegroundBitmap.getWidth()) / 2,
+                        (mHeight - (mAnimateHeight - mHeight / 4) - mForegroundBitmap.getHeight()) / 2, mBackgroundPaint);
 
             }
 
@@ -319,15 +345,27 @@ public class YesEqualityAnalog extends CanvasWatchFaceService {
 
             // restore the canvas' original orientation.
             canvas.restore();
+
+
+            if (mAnimateHeight < mAnimateTargetHeight && mAnimateHeight > mHeight / 4) {
+                invalidate();
+            } else {
+                mIsAnimating = false;
+            }
         }
+
 
         @Override
         public void onPeekCardPositionUpdate(Rect rect) {
             super.onPeekCardPositionUpdate(rect);
             mCardBounds.set(rect);
 
-            scaleForegroundBitmaps();
+            if (mCardBounds.height() > 0) {
+                mAnimateTargetHeight = mCardBounds.height() + mHeight / 4;
+            }
+            mIsAnimating = true;
             invalidate();
+
         }
 
         private void drawHand(Canvas canvas, float handLength, Paint handPaint) {
